@@ -126,4 +126,43 @@ class ProductService {
       throw Exception('Error fetching categories: $e');
     }
   }
+
+  // Upload ảnh cho sản phẩm đã có (có ID)
+  Future<String> uploadProductImage(int productId, String filePath) async {
+    try {
+      final response = await ApiService.uploadFile(
+        ApiConfig.productUploadImage(productId),
+        filePath,
+        'image',
+      );
+      final data = ApiService.parseResponse(response);
+
+      if (_isSuccess(data) && _getData(data) != null) {
+        return _getData(data) as String;
+      }
+      throw Exception('Failed to upload image');
+    } catch (e) {
+      throw Exception('Error uploading image: $e');
+    }
+  }
+
+  // Upload ảnh tạm cho sản phẩm mới (chưa có ID)
+  Future<String> uploadTempImage(String filePath, String productName) async {
+    try {
+      final response = await ApiService.uploadFile(
+        ApiConfig.productUploadTempImage,
+        filePath,
+        'image',
+        additionalFields: {'productName': productName},
+      );
+      final data = ApiService.parseResponse(response);
+
+      if (_isSuccess(data) && _getData(data) != null) {
+        return _getData(data) as String;
+      }
+      throw Exception('Failed to upload temp image');
+    } catch (e) {
+      throw Exception('Error uploading temp image: $e');
+    }
+  }
 }

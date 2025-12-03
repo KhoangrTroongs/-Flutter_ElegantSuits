@@ -82,5 +82,40 @@ class ProductProvider extends ChangeNotifier {
       return false;
     }
   }
-}
 
+  // Upload ảnh cho sản phẩm đã có
+  Future<String?> uploadProductImage(int productId, String filePath) async {
+    try {
+      final imageUrl = await _productService.uploadProductImage(
+        productId,
+        filePath,
+      );
+      // Cập nhật product trong list
+      final index = _products.indexWhere((p) => p.id == productId);
+      if (index != -1) {
+        _products[index] = _products[index].copyWith(imageUrl: imageUrl);
+        notifyListeners();
+      }
+      return imageUrl;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return null;
+    }
+  }
+
+  // Upload ảnh tạm cho sản phẩm mới
+  Future<String?> uploadTempImage(String filePath, String productName) async {
+    try {
+      final imageUrl = await _productService.uploadTempImage(
+        filePath,
+        productName,
+      );
+      return imageUrl;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return null;
+    }
+  }
+}

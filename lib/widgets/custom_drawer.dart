@@ -7,6 +7,7 @@ import '../screens/products/products_list_screen.dart';
 import '../screens/orders/orders_list_screen.dart';
 import '../screens/users/users_list_screen.dart';
 import '../screens/coupons/coupons_list_screen.dart';
+import '../screens/inventory/inventory_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -59,6 +60,16 @@ class CustomDrawer extends StatelessWidget {
                   activeIcon: Icons.local_offer,
                   title: 'Coupons',
                   onTap: () => _navigateTo(context, const CouponsListScreen()),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  child: Divider(color: AppTheme.borderColor),
+                ),
+                _DrawerMenuItem(
+                  icon: Icons.warehouse_outlined,
+                  activeIcon: Icons.warehouse,
+                  title: 'Quản lý kho',
+                  onTap: () => _navigateTo(context, const InventoryScreen()),
                 ),
               ],
             ),

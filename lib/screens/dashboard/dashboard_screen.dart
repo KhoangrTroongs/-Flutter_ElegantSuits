@@ -7,6 +7,7 @@ import '../products/products_list_screen.dart';
 import '../orders/orders_list_screen.dart';
 import '../users/users_list_screen.dart';
 import '../coupons/coupons_list_screen.dart';
+import '../inventory/inventory_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -264,6 +265,15 @@ class _DashboardScreenState extends State<DashboardScreen>
           colors: [Color(0xFFfa709a), Color(0xFFfee140)],
         ),
         onTap: () => _navigateTo(context, const CouponsListScreen()),
+      ),
+      _QuickActionItem(
+        title: 'Quản lý kho',
+        subtitle: 'Nhập/Xuất kho',
+        icon: Icons.warehouse_outlined,
+        gradient: const LinearGradient(
+          colors: [Color(0xFF11998e), Color(0xFF38ef7d)],
+        ),
+        onTap: () => _navigateTo(context, const InventoryScreen()),
       ),
     ];
 

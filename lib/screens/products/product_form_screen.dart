@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../providers/product_provider.dart';
 import '../../models/product.dart';
 import '../../config/app_theme.dart';
@@ -22,6 +24,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   int? _selectedCategoryId;
   bool _isHidden = false;
   bool _isSaving = false;
+  bool _isUploadingImage = false;
+
+  // Camera/Image picker
+  final ImagePicker _imagePicker = ImagePicker();
+  File? _selectedImage;
+  List<File> _capturedImages = [];
 
   @override
   void initState() {
@@ -52,6 +60,183 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     _priceController.dispose();
     _imageUrlController.dispose();
     super.dispose();
+  }
+
+  // Chụp ảnh từ camera
+  Future<void> _takePhoto() async {
+    try {
+      final XFile? photo = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 85,
+        maxWidth: 1920,
+        maxHeight: 1080,
+      );
+
+      if (photo != null) {
+        setState(() {
+          _selectedImage = File(photo.path);
+          _capturedImages.add(File(photo.path));
+        });
+
+        // Upload ảnh ngay sau khi chụp
+        await _uploadImage(File(photo.path));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text('Lỗi camera: $e')),
+              ],
+            ),
+            backgroundColor: AppTheme.errorColor,
+          ),
+        );
+      }
+    }
+  }
+
+  // Chọn ảnh từ thư viện
+  Future<void> _pickFromGallery() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+        maxWidth: 1920,
+        maxHeight: 1080,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImage = File(image.path);
+          _capturedImages.add(File(image.path));
+        });
+
+        // Upload ảnh ngay sau khi chọn
+        await _uploadImage(File(image.path));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text('Lỗi chọn ảnh: $e')),
+              ],
+            ),
+            backgroundColor: AppTheme.errorColor,
+          ),
+        );
+      }
+    }
+  }
+
+  // Upload ảnh lên server
+  Future<void> _uploadImage(File imageFile) async {
+    if (_nameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.warning, color: Colors.white),
+              SizedBox(width: 12),
+              Expanded(
+                child: Text('Vui lòng nhập tên sản phẩm trước khi chụp ảnh'),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isUploadingImage = true);
+
+    final provider = Provider.of<ProductProvider>(context, listen: false);
+    String? imageUrl;
+
+    try {
+      if (widget.product != null) {
+        // Sản phẩm đã có - upload với product ID
+        imageUrl = await provider.uploadProductImage(
+          widget.product!.id,
+          imageFile.path,
+        );
+      } else {
+        // Sản phẩm mới - upload với tên sản phẩm
+        imageUrl = await provider.uploadTempImage(
+          imageFile.path,
+          _nameController.text,
+        );
+      }
+
+      if (mounted) {
+        setState(() => _isUploadingImage = false);
+
+        if (imageUrl != null) {
+          _imageUrlController.text = imageUrl;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.white),
+                  SizedBox(width: 12),
+                  Text('Đã tải ảnh lên thành công!'),
+                ],
+              ),
+              backgroundColor: AppTheme.successColor,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.error, color: Colors.white),
+                  SizedBox(width: 12),
+                  Text('Không thể tải ảnh lên'),
+                ],
+              ),
+              backgroundColor: AppTheme.errorColor,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isUploadingImage = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text('Lỗi upload: $e')),
+              ],
+            ),
+            backgroundColor: AppTheme.errorColor,
+          ),
+        );
+      }
+    }
+  }
+
+  // Xóa ảnh đã chụp
+  void _removeImage(int index) {
+    setState(() {
+      _capturedImages.removeAt(index);
+      if (_capturedImages.isEmpty) {
+        _selectedImage = null;
+      } else {
+        _selectedImage = _capturedImages.last;
+      }
+    });
   }
 
   Future<void> _save() async {
@@ -253,13 +438,204 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   const SizedBox(height: 24),
                   _buildSectionTitle('Media'),
                   const SizedBox(height: 16),
+
+                  // Camera & Gallery buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _isUploadingImage ? null : _takePhoto,
+                          icon: _isUploadingImage
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.camera_alt),
+                          label: const Text('Chụp ảnh'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.goldColor,
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _isUploadingImage
+                              ? null
+                              : _pickFromGallery,
+                          icon: const Icon(Icons.photo_library),
+                          label: const Text('Thư viện'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.cardColor,
+                            foregroundColor: AppTheme.goldColor,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(color: AppTheme.goldColor),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Hiển thị ảnh đã chụp
+                  if (_capturedImages.isNotEmpty) ...[
+                    Container(
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: AppTheme.cardColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppTheme.goldColor.withOpacity(0.3),
+                        ),
+                      ),
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.all(8),
+                        itemCount: _capturedImages.length,
+                        itemBuilder: (context, index) {
+                          return Stack(
+                            children: [
+                              Container(
+                                width: 100,
+                                margin: const EdgeInsets.only(right: 8),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: index == _capturedImages.length - 1
+                                        ? AppTheme.goldColor
+                                        : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: Image.file(
+                                    _capturedImages[index],
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 4,
+                                right: 12,
+                                child: GestureDetector(
+                                  onTap: () => _removeImage(index),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.close,
+                                      size: 14,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // Image URL field (readonly khi đã upload)
                   TextFormField(
                     controller: _imageUrlController,
-                    decoration: const InputDecoration(
-                      labelText: 'Image URL (optional)',
-                      prefixIcon: Icon(Icons.image_outlined),
+                    decoration: InputDecoration(
+                      labelText: 'Image URL',
+                      prefixIcon: const Icon(Icons.image_outlined),
+                      suffixIcon: _imageUrlController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear, color: Colors.grey),
+                              onPressed: () {
+                                setState(() {
+                                  _imageUrlController.clear();
+                                });
+                              },
+                            )
+                          : null,
+                      helperText: 'Chụp ảnh hoặc nhập URL trực tiếp',
+                      helperStyle: TextStyle(
+                        color: AppTheme.goldColor.withOpacity(0.7),
+                        fontSize: 12,
+                      ),
                     ),
                   ),
+
+                  // Preview ảnh từ URL
+                  if (_imageUrlController.text.isNotEmpty &&
+                      _capturedImages.isEmpty) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      height: 150,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppTheme.cardColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppTheme.goldColor.withOpacity(0.3),
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          _imageUrlController.text.startsWith('http')
+                              ? _imageUrlController.text
+                              : 'https://localhost:5001${_imageUrlController.text}',
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.broken_image,
+                                    color: Colors.grey,
+                                    size: 40,
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Không thể tải ảnh',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value:
+                                    loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                    : null,
+                                color: AppTheme.goldColor,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+
                   const SizedBox(height: 24),
                   _buildSectionTitle('Visibility'),
                   const SizedBox(height: 8),

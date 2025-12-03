@@ -1,6 +1,5 @@
 import '../config/api_config.dart';
 import '../models/user.dart';
-import '../models/response.dart';
 import 'api_service.dart';
 
 class AuthService {

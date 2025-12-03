@@ -10,6 +10,8 @@ class Product {
   final int categoryId;
   final String? categoryName;
   final bool isHidden;
+  final int quantity;
+  final String? linearCode;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -22,6 +24,8 @@ class Product {
     required this.categoryId,
     this.categoryName,
     this.isHidden = false,
+    this.quantity = 0,
+    this.linearCode,
     this.createdAt,
     this.updatedAt,
   });
@@ -48,6 +52,8 @@ class Product {
       categoryId: json['CategoryId'] ?? json['categoryId'] ?? 0,
       categoryName: json['CategoryName'] ?? json['categoryName'],
       isHidden: json['IsHidden'] ?? json['isHidden'] ?? false,
+      quantity: json['Quantity'] ?? json['quantity'] ?? 0,
+      linearCode: json['LinearCode'] ?? json['linearCode'],
       createdAt: (json['CreatedAt'] ?? json['createdAt']) != null
           ? DateTime.parse(json['CreatedAt'] ?? json['createdAt'])
           : null,
@@ -67,6 +73,8 @@ class Product {
       'categoryId': categoryId,
       'categoryName': categoryName,
       'isHidden': isHidden,
+      'quantity': quantity,
+      'linearCode': linearCode,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
@@ -81,6 +89,8 @@ class Product {
     int? categoryId,
     String? categoryName,
     bool? isHidden,
+    int? quantity,
+    String? linearCode,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -93,6 +103,8 @@ class Product {
       categoryId: categoryId ?? this.categoryId,
       categoryName: categoryName ?? this.categoryName,
       isHidden: isHidden ?? this.isHidden,
+      quantity: quantity ?? this.quantity,
+      linearCode: linearCode ?? this.linearCode,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

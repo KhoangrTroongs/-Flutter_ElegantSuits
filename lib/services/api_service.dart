@@ -102,6 +102,61 @@ class ApiService {
     return await http.Response.fromStream(streamedResponse);
   }
 
+  // Upload file với multipart
+  static Future<http.Response> uploadFile(
+    String url,
+    String filePath,
+    String fieldName, {
+    Map<String, String>? additionalFields,
+  }) async {
+    final token = await getToken();
+    final request = http.MultipartRequest('POST', Uri.parse(url));
+
+    if (token != null) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+
+    // Thêm file
+    request.files.add(await http.MultipartFile.fromPath(fieldName, filePath));
+
+    // Thêm các fields bổ sung nếu có
+    if (additionalFields != null) {
+      request.fields.addAll(additionalFields);
+    }
+
+    final streamedResponse = await request.send().timeout(ApiConfig.timeout);
+    return await http.Response.fromStream(streamedResponse);
+  }
+
+  // Upload file từ bytes (cho web hoặc camera)
+  static Future<http.Response> uploadFileBytes(
+    String url,
+    List<int> bytes,
+    String fileName,
+    String fieldName, {
+    Map<String, String>? additionalFields,
+  }) async {
+    final token = await getToken();
+    final request = http.MultipartRequest('POST', Uri.parse(url));
+
+    if (token != null) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+
+    // Thêm file từ bytes
+    request.files.add(
+      http.MultipartFile.fromBytes(fieldName, bytes, filename: fileName),
+    );
+
+    // Thêm các fields bổ sung nếu có
+    if (additionalFields != null) {
+      request.fields.addAll(additionalFields);
+    }
+
+    final streamedResponse = await request.send().timeout(ApiConfig.timeout);
+    return await http.Response.fromStream(streamedResponse);
+  }
+
   static Map<String, dynamic> parseResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return jsonDecode(response.body);

@@ -39,6 +39,10 @@ class ApiConfig {
   static String productById(int id) => '$baseUrl/Products/$id';
   static String get productsPaged => '$baseUrl/Products/paged';
   static String get productsSearch => '$baseUrl/Products/search';
+  static String productUploadImage(int id) =>
+      '$baseUrl/Products/$id/upload-image';
+  static String get productUploadTempImage =>
+      '$baseUrl/Products/upload-temp-image';
 
   // Orders endpoints
   static String get orders => '$baseUrl/Orders';
@@ -58,6 +62,17 @@ class ApiConfig {
 
   // Statistics endpoints
   static String get dashboard => '$baseUrl/StatisticsApi/dashboard';
+
+  // Inventory endpoints
+  static String get inventory => '$baseUrl/Inventory';
+  static String inventoryByLinear(String linearCode) =>
+      '$baseUrl/Inventory/by-linear/$linearCode';
+  static String inventoryUpdateQuantity(int productId) =>
+      '$baseUrl/Inventory/$productId/update-quantity';
+  static String get inventoryGenerateLinearCodes =>
+      '$baseUrl/Inventory/generate-linear-codes';
+  static String get inventoryExportLinearCodes =>
+      '$baseUrl/Inventory/export-linear-codes';
 
   // Timeout
   static const Duration timeout = Duration(seconds: 30);
