@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
 import 'config/app_theme.dart';
 import 'providers/auth_provider.dart';
@@ -9,7 +11,24 @@ import 'providers/coupon_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 
+/// HttpOverrides để bypass SSL certificate check trong development
+/// CHỈ SỬ DỤNG CHO DEVELOPMENT - KHÔNG DÙNG CHO PRODUCTION!
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 void main() {
+  // Bypass SSL certificate check cho development (Android Emulator, etc.)
+  // Chỉ áp dụng cho non-web platforms
+  if (!kIsWeb) {
+    HttpOverrides.global = MyHttpOverrides();
+  }
+
   runApp(const MyApp());
 }
 

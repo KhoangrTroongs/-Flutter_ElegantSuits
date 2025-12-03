@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Cho phép debug override để có thể trust user certificates -->
+    <debug-overrides>
+        <trust-anchors>
+            <!-- Trust user added CAs while debuggable -->
+            <certificates src="user" />
+            <certificates src="system" />
+        </trust-anchors>
+    </debug-overrides>
+    
+    <!-- Cấu hình cho các domain cụ thể -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Localhost cho Android Emulator (10.0.2.2 = localhost của máy host) -->
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        
+        <!-- Trust certificates cho development -->
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </domain-config>
+    
+    <!-- Cấu hình mặc định cho các domain khác -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <!-- Cho phép user certificates cho development -->
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
+
