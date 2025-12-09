@@ -9,10 +9,12 @@ import 'providers/order_provider.dart';
 import 'providers/user_provider.dart';
 import 'providers/coupon_provider.dart';
 import 'providers/inventory_provider.dart';
+import 'providers/pos_provider.dart';
 import 'services/inventory_service.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 import 'screens/inventory/inventory_screen.dart';
+import 'screens/pos/pos_screen.dart';
 
 /// HttpOverrides để bypass SSL certificate check trong development
 /// CHỈ SỬ DỤNG CHO DEVELOPMENT - KHÔNG DÙNG CHO PRODUCTION!
@@ -50,6 +52,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => InventoryProvider(InventoryService()),
         ),
+        ChangeNotifierProvider(create: (_) => PosProvider()),
       ],
       child: MaterialApp(
         title: 'Elegant Suits Admin',
@@ -60,6 +63,7 @@ class MyApp extends StatelessWidget {
           '/login': (context) => const LoginScreen(),
           '/dashboard': (context) => const DashboardScreen(),
           '/inventory': (context) => const InventoryScreen(),
+          '/pos': (context) => const PosScreen(),
         },
       ),
     );

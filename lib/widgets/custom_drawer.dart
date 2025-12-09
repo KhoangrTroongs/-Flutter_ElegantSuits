@@ -8,6 +8,7 @@ import '../screens/orders/orders_list_screen.dart';
 import '../screens/users/users_list_screen.dart';
 import '../screens/coupons/coupons_list_screen.dart';
 import '../screens/inventory/inventory_screen.dart';
+import '../screens/pos/pos_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -70,6 +71,12 @@ class CustomDrawer extends StatelessWidget {
                   activeIcon: Icons.warehouse,
                   title: 'Quản lý kho',
                   onTap: () => _navigateTo(context, const InventoryScreen()),
+                ),
+                _DrawerMenuItem(
+                  icon: Icons.point_of_sale_outlined,
+                  activeIcon: Icons.point_of_sale,
+                  title: 'Tạo đơn hàng (POS)',
+                  onTap: () => _navigateTo(context, const PosScreen()),
                 ),
               ],
             ),

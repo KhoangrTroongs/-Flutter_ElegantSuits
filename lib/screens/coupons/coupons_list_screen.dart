@@ -5,6 +5,12 @@ import '../../providers/coupon_provider.dart';
 import '../../config/app_theme.dart';
 import 'coupon_form_screen.dart';
 
+// Format giá VNĐ
+String formatVND(double price) {
+  final formatter = NumberFormat('#,###', 'vi_VN');
+  return formatter.format(price);
+}
+
 class CouponsListScreen extends StatefulWidget {
   const CouponsListScreen({super.key});
 
@@ -372,8 +378,8 @@ class _CouponCard extends StatelessWidget {
                             const SizedBox(height: 2),
                             Text(
                               coupon.minimumAmount > 0
-                                  ? '\$${coupon.minimumAmount.toStringAsFixed(0)}'
-                                  : 'No minimum',
+                                  ? '${formatVND(coupon.minimumAmount)}₫'
+                                  : 'Không giới hạn',
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,

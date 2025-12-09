@@ -2,6 +2,17 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ApiConfig {
+  // ========== CẤU HÌNH CHO ĐIỆN THOẠI THẬT ==========
+  // Đặt true nếu đang test trên điện thoại thật (kết nối cùng mạng WiFi)
+  // Đặt false nếu đang test trên Emulator
+  static const bool useRealDevice =
+      true; // Đổi thành true khi test trên điện thoại thật
+
+  // IP của máy tính chạy backend (lấy từ ipconfig)
+  // Điện thoại và máy tính phải cùng mạng WiFi
+  static const String hostIP = '192.168.1.12';
+  // =================================================
+
   // Tự động phát hiện platform và sử dụng URL phù hợp
   static String get baseUrl {
     // Port của API .NET
@@ -14,8 +25,13 @@ class ApiConfig {
 
     try {
       if (Platform.isAndroid) {
-        // Android Emulator - 10.0.2.2 là địa chỉ đặc biệt trỏ đến localhost của máy host
-        return 'https://10.0.2.2:$port/api';
+        if (useRealDevice) {
+          // Điện thoại Android thật - sử dụng IP của máy tính
+          return 'http://$hostIP:$port/api';
+        } else {
+          // Android Emulator - 10.0.2.2 là địa chỉ đặc biệt trỏ đến localhost của máy host
+          return 'https://10.0.2.2:$port/api';
+        }
       } else if (Platform.isIOS) {
         // iOS Simulator - có thể dùng localhost
         return 'https://localhost:$port/api';
@@ -48,6 +64,7 @@ class ApiConfig {
   static String get orders => '$baseUrl/Orders';
   static String orderById(int id) => '$baseUrl/Orders/$id';
   static String orderStatus(int id) => '$baseUrl/Orders/$id/status';
+  static String get posOrder => '$baseUrl/Orders/pos';
 
   // Users endpoints
   static String get users => '$baseUrl/Users';
@@ -73,6 +90,14 @@ class ApiConfig {
       '$baseUrl/Inventory/generate-linear-codes';
   static String get inventoryExportLinearCodes =>
       '$baseUrl/Inventory/export-linear-codes';
+
+  // Payment endpoints
+  static String get payment => '$baseUrl/PaymentApi';
+  static String paymentVnPayCreate(int orderId) =>
+      '$baseUrl/PaymentApi/vnpay/create/$orderId';
+  static String paymentStatus(int orderId) =>
+      '$baseUrl/PaymentApi/status/$orderId';
+  static String paymentCash(int orderId) => '$baseUrl/PaymentApi/cash/$orderId';
 
   // Timeout
   static const Duration timeout = Duration(seconds: 30);

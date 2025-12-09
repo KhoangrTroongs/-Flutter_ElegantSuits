@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../config/app_theme.dart';
 import '../../widgets/custom_drawer.dart';
+import '../../services/statistics_service.dart';
+import '../../models/statistics.dart';
 import '../products/products_list_screen.dart';
 import '../orders/orders_list_screen.dart';
 import '../users/users_list_screen.dart';
@@ -19,6 +21,11 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+  final StatisticsService _statisticsService = StatisticsService();
+
+  StatisticsOverview? _statistics;
+  bool _isLoading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -28,6 +35,33 @@ class _DashboardScreenState extends State<DashboardScreen>
       duration: const Duration(milliseconds: 800),
     );
     _animationController.forward();
+    _loadStatistics();
+  }
+
+  Future<void> _loadStatistics() async {
+    if (!mounted) return;
+
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      // Lấy thống kê tháng này thay vì chỉ hôm nay
+      final stats = await _statisticsService.getMonthStatistics();
+
+      if (!mounted) return;
+      setState(() {
+        _statistics = stats;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -200,13 +234,63 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
+  String _formatCurrency(double value) {
+    if (value >= 1000000) {
+      return '${(value / 1000000).toStringAsFixed(1)}M₫';
+    } else if (value >= 1000) {
+      return '${(value / 1000).toStringAsFixed(0)}K₫';
+    }
+    return '${value.toStringAsFixed(0)}₫';
+  }
+
   Widget _buildStatsSection() {
+    if (_isLoading) {
+      return Row(
+        children: [
+          Expanded(child: _buildLoadingCard()),
+          const SizedBox(width: 12),
+          Expanded(child: _buildLoadingCard()),
+        ],
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.errorColor.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.error_outline, color: AppTheme.errorColor),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Không thể tải thống kê',
+                style: TextStyle(color: AppTheme.errorColor),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _loadStatistics,
+              color: AppTheme.errorColor,
+            ),
+          ],
+        ),
+      );
+    }
+
+    final stats = _statistics;
+    final monthRevenue = stats?.totalRevenue ?? 0;
+    final totalOrders = stats?.totalOrders ?? 0;
+
     return Row(
       children: [
         Expanded(
           child: _StatCard(
-            title: 'Today Sales',
-            value: '\$1,250',
+            title: 'Doanh thu tháng',
+            value: _formatCurrency(monthRevenue),
             icon: Icons.trending_up,
             color: AppTheme.successColor,
             delay: 0.1,
@@ -216,8 +300,8 @@ class _DashboardScreenState extends State<DashboardScreen>
         const SizedBox(width: 12),
         Expanded(
           child: _StatCard(
-            title: 'Orders',
-            value: '24',
+            title: 'Đơn hàng tháng',
+            value: totalOrders.toString(),
             icon: Icons.shopping_bag_outlined,
             color: AppTheme.goldColor,
             delay: 0.2,
@@ -225,6 +309,29 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildLoadingCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppTheme.cardShadow,
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 32,
+            height: 32,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+          SizedBox(height: 12),
+          Text('Đang tải...', style: TextStyle(color: AppTheme.textSecondary)),
+        ],
+      ),
     );
   }
 

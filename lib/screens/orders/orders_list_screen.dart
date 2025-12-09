@@ -5,6 +5,12 @@ import '../../providers/order_provider.dart';
 import '../../config/app_theme.dart';
 import 'order_detail_screen.dart';
 
+// Format giá VNĐ
+String formatVND(double price) {
+  final formatter = NumberFormat('#,###', 'vi_VN');
+  return formatter.format(price);
+}
+
 class OrdersListScreen extends StatefulWidget {
   const OrdersListScreen({super.key});
 
@@ -292,7 +298,7 @@ class _OrderCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '\$${order.totalAmount.toStringAsFixed(2)}',
+                        '${formatVND(order.totalAmount)}₫',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../../providers/product_provider.dart';
 import '../../config/app_theme.dart';
 import 'product_form_screen.dart';
+
+// Format giá VNĐ
+String formatVND(double price) {
+  final formatter = NumberFormat('#,###', 'vi_VN');
+  return formatter.format(price);
+}
 
 class ProductsListScreen extends StatefulWidget {
   const ProductsListScreen({super.key});
@@ -325,7 +332,7 @@ class _ProductCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              '\$${product.price.toStringAsFixed(2)}',
+                              '${formatVND(product.price)}₫',
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,

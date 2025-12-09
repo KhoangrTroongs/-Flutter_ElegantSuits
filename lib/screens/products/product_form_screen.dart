@@ -404,12 +404,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   TextFormField(
                     controller: _priceController,
                     decoration: const InputDecoration(
-                      labelText: 'Price',
-                      prefixIcon: Icon(Icons.attach_money),
+                      labelText: 'Giá (VNĐ)',
+                      prefixText: '₫ ',
                     ),
                     keyboardType: TextInputType.number,
                     validator: (v) =>
-                        v?.isEmpty ?? true ? 'Price is required' : null,
+                        v?.isEmpty ?? true ? 'Vui lòng nhập giá' : null,
                   ),
                   const SizedBox(height: 16),
                   Consumer<ProductProvider>(

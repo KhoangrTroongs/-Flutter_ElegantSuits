@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../../models/inventory_item.dart';
 import '../../providers/inventory_provider.dart';
 import '../../widgets/custom_drawer.dart';
 import 'scan_barcode_screen.dart';
+
+// Format giá VNĐ
+String formatVND(double price) {
+  final formatter = NumberFormat('#,###', 'vi_VN');
+  return formatter.format(price);
+}
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -447,7 +454,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
             _buildDetailRow('Mã sản phẩm', '#${item.productId}'),
             _buildDetailRow('Mã Linear', item.linearCode ?? 'Chưa có'),
             _buildDetailRow('Số lượng tồn', '${item.quantity}'),
-            _buildDetailRow('Giá', '${item.price.toStringAsFixed(0)}đ'),
+            _buildDetailRow('Giá', '${formatVND(item.price)}₫'),
             const SizedBox(height: 24),
             Row(
               children: [
