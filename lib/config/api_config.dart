@@ -10,40 +10,40 @@ class ApiConfig {
 
   // IP của máy tính chạy backend (lấy từ ipconfig)
   // Điện thoại và máy tính phải cùng mạng WiFi
-  static const String hostIP = '192.168.1.12';
+  static const String hostIP = '192.168.1.8';
   // =================================================
 
   // Tự động phát hiện platform và sử dụng URL phù hợp
   static String get baseUrl {
     // Port của API .NET
-    const String port = '5001';
+    const String port = '5050';
 
     if (kIsWeb) {
       // Web browser - sử dụng localhost
-      return 'https://localhost:$port/api';
+      return 'http://localhost:$port/api';
     }
 
     try {
-      if (Platform.isAndroid) {
+      if (Platform.isAndroid || Platform.isIOS) {
         if (useRealDevice) {
-          // Điện thoại Android thật - sử dụng IP của máy tính
+          // Điện thoại thật (Android/iOS) - sử dụng IP của máy tính
           return 'http://$hostIP:$port/api';
-        } else {
-          // Android Emulator - 10.0.2.2 là địa chỉ đặc biệt trỏ đến localhost của máy host
-          return 'https://10.0.2.2:$port/api';
         }
-      } else if (Platform.isIOS) {
-        // iOS Simulator - có thể dùng localhost
-        return 'https://localhost:$port/api';
+        if (Platform.isAndroid) {
+          // Android Emulator
+          return 'http://10.0.2.2:$port/api';
+        }
+        // iOS Simulator
+        return 'http://localhost:$port/api';
       } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
         // Desktop - sử dụng localhost
-        return 'https://localhost:$port/api';
+        return 'http://localhost:$port/api';
       }
     } catch (e) {
       // Fallback nếu không thể xác định platform
     }
 
-    return 'https://localhost:$port/api';
+    return 'http://localhost:$port/api';
   }
 
   // Auth endpoints

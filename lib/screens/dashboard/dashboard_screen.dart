@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:animate_do/animate_do.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../providers/auth_provider.dart';
 import '../../config/app_theme.dart';
 import '../../widgets/custom_drawer.dart';
@@ -10,6 +12,7 @@ import '../orders/orders_list_screen.dart';
 import '../users/users_list_screen.dart';
 import '../coupons/coupons_list_screen.dart';
 import '../inventory/inventory_screen.dart';
+import '../pos/pos_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -165,14 +168,8 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget _buildWelcomeSection(String name) {
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, 20 * (1 - _animationController.value)),
-          child: Opacity(opacity: _animationController.value, child: child),
-        );
-      },
+    return FadeInDown(
+      duration: const Duration(milliseconds: 600),
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
@@ -320,23 +317,57 @@ class _DashboardScreenState extends State<DashboardScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: AppTheme.cardShadow,
       ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 32,
-            height: 32,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-          SizedBox(height: 12),
-          Text('Đang tải...', style: TextStyle(color: AppTheme.textSecondary)),
-        ],
+      child: Shimmer.fromColors(
+        baseColor: AppTheme.primaryColor,
+        highlightColor: AppTheme.cardColor,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: 80,
+              height: 24,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              width: 60,
+              height: 12,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildQuickActionsSection(BuildContext context) {
     final items = [
+      _QuickActionItem(
+        title: 'POS',
+        subtitle: 'Point of Sale',
+        icon: Icons.point_of_sale_rounded,
+        gradient: const LinearGradient(
+          colors: [Color(0xFFD4AF37), Color(0xFF1a1a1a)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        onTap: () => _navigateTo(context, const PosScreen()),
+      ),
       _QuickActionItem(
         title: 'Products',
         subtitle: 'Manage inventory',

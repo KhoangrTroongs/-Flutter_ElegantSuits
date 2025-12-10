@@ -5,6 +5,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../providers/pos_provider.dart';
 import '../../models/cart.dart' show CartItem;
 import '../../config/app_theme.dart';
+import '../../config/api_config.dart';
+import 'dart:async';
+import 'package:app_links/app_links.dart';
 import '../inventory/scan_barcode_screen.dart';
 
 // Format giá VNĐ
@@ -28,12 +31,81 @@ class _PosScreenState extends State<PosScreen> {
   @override
   void initState() {
     super.initState();
+    // Khởi tạo data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<PosProvider>(context, listen: false);
       provider.loadProducts();
-      provider.loadCoupons(); // Load danh sách coupon
-      provider.selectGuestCustomer(); // Mặc định chọn khách vãn lai
+      provider.loadCoupons();
     });
+
+    // Lắng nghe deep link
+    _initDeepLinkListener();
+  }
+
+  void _initDeepLinkListener() {
+    final _appLinks = AppLinks();
+    _appLinks.uriLinkStream.listen((uri) {
+      if (uri.scheme == 'elegantsuits' && uri.path.contains('payment-result')) {
+        // Parse params: ?orderId=123&status=00
+        final orderIdStr = uri.queryParameters['orderId'];
+        final status = uri.queryParameters['status'];
+
+        if (orderIdStr != null && mounted) {
+          final orderId = int.tryParse(orderIdStr);
+          if (orderId != null) {
+            if (status == 'success') {
+              _checkPaymentAndShowDialog(orderId);
+            } else {
+              // Payment failed or other status
+              _handlePaymentFailure(status ?? 'unknown');
+            }
+          }
+        }
+      }
+    });
+  }
+
+  Future<void> _checkPaymentAndShowDialog(int orderId) async {
+    try {
+      final provider = Provider.of<PosProvider>(context, listen: false);
+      final statusData = await provider.checkPaymentStatus(orderId);
+
+      if (!mounted) return;
+
+      if (statusData != null && statusData['isPaid'] == true) {
+        // Safely close any open dialogs
+        while (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+
+        _showSuccessDialog(orderId, 'VNPay');
+        provider.reset();
+        provider.selectGuestCustomer();
+      }
+    } catch (e) {
+      print('Error checking payment status: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi kiểm tra trạng thái thanh toán')),
+        );
+      }
+    }
+  }
+
+  void _handlePaymentFailure(String status) {
+    if (!mounted) return;
+
+    // Close any dialogs
+    while (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Thanh toán thất bại: $status'),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   @override
@@ -1036,15 +1108,9 @@ class _PosScreenState extends State<PosScreen> {
           if (canLaunch) {
             await launchUrl(uri, mode: LaunchMode.externalApplication);
             if (!mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Đã mở trang thanh toán VNPay cho đơn hàng #$orderId',
-                ),
-              ),
-            );
-            provider.reset();
-            provider.selectGuestCustomer();
+
+            // Show dialog to check payment completion
+            _showPaymentConfirmationDialog(provider, orderId);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Không thể mở trang thanh toán')),
@@ -1067,16 +1133,24 @@ class _PosScreenState extends State<PosScreen> {
   void _showSuccessDialog(int orderId, String paymentMethod) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
         title: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.green[400], size: 32),
+            Icon(Icons.check_circle, color: Colors.green[400], size: 28),
             const SizedBox(width: 12),
-            const Text(
-              'Thanh toán thành công!',
-              style: TextStyle(color: AppTheme.textPrimary),
+            const Expanded(
+              child: Text(
+                'Thanh toán thành công!',
+                style: TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         ),
@@ -1084,32 +1158,136 @@ class _PosScreenState extends State<PosScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 8),
             Text(
               'Đơn hàng #$orderId',
               style: const TextStyle(
                 color: AppTheme.goldColor,
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Phương thức: $paymentMethod',
-              style: TextStyle(color: AppTheme.textSecondary),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Icon(
+                  Icons.payment,
+                  size: 16,
+                  color: AppTheme.textSecondary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Phương thức: $paymentMethod',
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
+            const SizedBox(height: 8),
           ],
         ),
         actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.goldColor,
-              foregroundColor: Colors.white,
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.goldColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Đóng',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
             ),
-            child: const Text('Đóng'),
           ),
         ],
       ),
     );
+  }
+
+  /// Hiển thị dialog xác nhận thanh toán VNPay
+  void _showPaymentConfirmationDialog(PosProvider provider, int orderId) {
+    Timer? timer;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        // Tự động kiểm tra sau mỗi 3 giây
+        timer = Timer.periodic(const Duration(seconds: 3), (t) async {
+          final statusData = await provider.checkPaymentStatus(orderId);
+          if (statusData != null && statusData['isPaid'] == true) {
+            t.cancel();
+            if (context.mounted) {
+              Navigator.pop(context); // Close dialog
+              _showSuccessDialog(orderId, 'VNPay');
+              provider.reset();
+              provider.selectGuestCustomer();
+            }
+          }
+        });
+
+        return AlertDialog(
+          backgroundColor: AppTheme.cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppTheme.goldColor,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Đang chờ thanh toán...',
+                style: TextStyle(color: AppTheme.textPrimary),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Vui lòng hoàn tất thanh toán trên ứng dụng VNPay hoặc trình duyệt.',
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Hệ thống sẽ tự động xác nhận khi nhận được thanh toán.',
+                style: TextStyle(
+                  color: AppTheme.textSecondary.withValues(alpha: 0.7),
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                timer?.cancel();
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'Hủy / Để sau',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+          ],
+        );
+      },
+    ).then((_) => timer?.cancel());
   }
 }
