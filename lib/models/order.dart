@@ -44,13 +44,14 @@ class Order {
 
   static String _parseStatus(dynamic status) {
     if (status is int) {
-      // Enum values: 0=Pending, 1=Processing, 2=Shipped, 3=Delivered, 4=Cancelled
+      // Enum values: 0=Pending, 1=Confirmed, 2=Shipping, 3=Delivered, 4=Cancelled, 5=Returned
       const statusNames = [
         'Pending',
-        'Processing',
-        'Shipped',
+        'Confirmed',
+        'Shipping',
         'Delivered',
         'Cancelled',
+        'Returned',
       ];
       return status >= 0 && status < statusNames.length
           ? statusNames[status]

@@ -43,8 +43,12 @@ class InventoryService {
         ApiConfig.inventoryByLinear(linearCode),
       );
       final json = jsonDecode(response.body);
-      if (json['succeeded'] == true && json['data'] != null) {
-        return InventoryItem.fromJson(json['data']);
+
+      final isSuccess = json['IsSuccess'] ?? json['succeeded'] ?? false;
+      final data = json['Data'] ?? json['data'];
+
+      if (isSuccess == true && data != null) {
+        return InventoryItem.fromJson(data);
       }
       return null;
     } catch (e) {
@@ -65,8 +69,12 @@ class InventoryService {
       {'quantity': quantity, 'isAbsolute': isAbsolute},
     );
     final json = jsonDecode(response.body);
-    if (json['succeeded'] == true && json['data'] != null) {
-      return InventoryItem.fromJson(json['data']);
+
+    final isSuccess = json['IsSuccess'] ?? json['succeeded'] ?? false;
+    final data = json['Data'] ?? json['data'];
+
+    if (isSuccess == true && data != null) {
+      return InventoryItem.fromJson(data);
     }
     return null;
   }
@@ -93,9 +101,15 @@ class InventoryService {
       {},
     );
     final json = jsonDecode(response.body);
-    if (json['succeeded'] == true) {
-      return json['data'] ?? 0;
+
+    final isSuccess = json['IsSuccess'] ?? json['succeeded'] ?? false;
+    final data = json['Data'] ?? json['data'];
+
+    if (isSuccess == true) {
+      return data ?? 0;
     }
-    throw Exception(json['message'] ?? 'Lỗi khi tạo mã linear');
+    throw Exception(
+      json['Message'] ?? json['message'] ?? 'Lỗi khi tạo mã linear',
+    );
   }
 }

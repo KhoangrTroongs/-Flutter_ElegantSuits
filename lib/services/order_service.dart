@@ -62,10 +62,30 @@ class OrderService {
     }
   }
 
+  int _statusToInt(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 0;
+      case 'confirmed':
+        return 1;
+      case 'shipping':
+        return 2;
+      case 'delivered':
+        return 3;
+      case 'cancelled':
+        return 4;
+      case 'returned':
+        return 5;
+      default:
+        return 0;
+    }
+  }
+
   Future<void> updateOrderStatus(int id, String status) async {
     try {
+      final statusInt = _statusToInt(status);
       final response = await ApiService.put(ApiConfig.orderStatus(id), {
-        'status': status,
+        'status': statusInt,
       });
       final data = ApiService.parseResponse(response);
 

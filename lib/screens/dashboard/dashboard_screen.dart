@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
@@ -6,6 +7,7 @@ import '../../providers/auth_provider.dart';
 import '../../config/app_theme.dart';
 import '../../widgets/custom_drawer.dart';
 import '../../services/statistics_service.dart';
+import '../../services/signalr_service.dart';
 import '../../models/statistics.dart';
 import '../products/products_list_screen.dart';
 import '../orders/orders_list_screen.dart';
@@ -25,6 +27,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   final StatisticsService _statisticsService = StatisticsService();
+  StreamSubscription? _signalRSubscription;
 
   StatisticsOverview? _statistics;
   bool _isLoading = true;
@@ -39,6 +42,55 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
     _animationController.forward();
     _loadStatistics();
+    _initSignalR();
+  }
+
+  void _initSignalR() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final signalRService = Provider.of<SignalRService>(
+        context,
+        listen: false,
+      );
+      signalRService.initSignalR();
+      _signalRSubscription = signalRService.messageStream.listen((message) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.notifications_active, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(color: Colors.white),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppTheme.primaryColor,
+            duration: const Duration(seconds: 4),
+            action: SnackBarAction(
+              label: 'XEM',
+              textColor: AppTheme.goldColor,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const OrdersListScreen()),
+                );
+              },
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+        _loadStatistics();
+      });
+    });
   }
 
   Future<void> _loadStatistics() async {
@@ -70,6 +122,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    _signalRSubscription?.cancel();
     super.dispose();
   }
 

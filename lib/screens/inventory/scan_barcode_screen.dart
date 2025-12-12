@@ -6,7 +6,9 @@ import '../../models/inventory_item.dart';
 import '../../providers/inventory_provider.dart';
 
 class ScanBarcodeScreen extends StatefulWidget {
-  const ScanBarcodeScreen({super.key});
+  final bool isPosMode;
+
+  const ScanBarcodeScreen({super.key, this.isPosMode = false});
 
   @override
   State<ScanBarcodeScreen> createState() => _ScanBarcodeScreenState();
@@ -86,9 +88,16 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen> {
     });
   }
 
-  Future<void> _importStock() async {
+  Future<void> _onAction() async {
     if (_foundItem == null) return;
 
+    // Nếu là POS Mode -> Trả về barcode cho PosScreen xử lý
+    if (widget.isPosMode) {
+      Navigator.pop(context, _barcodeController.text);
+      return;
+    }
+
+    // Nếu là Inventory Mode -> Nhập kho
     final quantity = int.tryParse(_quantityController.text) ?? 0;
     if (quantity <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -222,7 +231,7 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
       appBar: AppBar(
-        title: const Text('Quét mã nhập kho'),
+        title: Text(widget.isPosMode ? 'Quét mã sản phẩm' : 'Quét mã nhập kho'),
         backgroundColor: const Color(0xFF16213E),
         actions: [
           // Toggle camera/manual mode
@@ -490,75 +499,85 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen> {
           const SizedBox(height: 24),
           const Divider(color: Colors.grey),
           const SizedBox(height: 16),
-          const Text(
-            'Nhập số lượng cần nhập kho:',
-            style: TextStyle(color: Colors.white70),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {
-                  final current = int.tryParse(_quantityController.text) ?? 1;
-                  if (current > 1) {
-                    _quantityController.text = (current - 1).toString();
-                  }
-                },
-                icon: const Icon(
-                  Icons.remove_circle,
-                  color: Color(0xFFD4AF37),
-                  size: 32,
-                ),
-              ),
-              Expanded(
-                child: TextField(
-                  controller: _quantityController,
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+
+          // Chỉ hiển thị nhập số lượng nếu KHÔNG phải POS Mode
+          if (!widget.isPosMode) ...[
+            const Text(
+              'Nhập số lượng cần nhập kho:',
+              style: TextStyle(color: Colors.white70),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    final current = int.tryParse(_quantityController.text) ?? 1;
+                    if (current > 1) {
+                      _quantityController.text = (current - 1).toString();
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.remove_circle,
+                    color: Color(0xFFD4AF37),
+                    size: 32,
                   ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color(0xFF1A1A2E),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: _quantityController,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: const Color(0xFF1A1A2E),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              IconButton(
-                onPressed: () {
-                  final current = int.tryParse(_quantityController.text) ?? 0;
-                  _quantityController.text = (current + 1).toString();
-                },
-                icon: const Icon(
-                  Icons.add_circle,
-                  color: Color(0xFFD4AF37),
-                  size: 32,
+                IconButton(
+                  onPressed: () {
+                    final current = int.tryParse(_quantityController.text) ?? 0;
+                    _quantityController.text = (current + 1).toString();
+                  },
+                  icon: const Icon(
+                    Icons.add_circle,
+                    color: Color(0xFFD4AF37),
+                    size: 32,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
+
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: _importStock,
+              onPressed: _onAction,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: widget.isPosMode
+                    ? const Color(0xFFD4AF37)
+                    : Colors.green,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              icon: const Icon(Icons.add_shopping_cart, color: Colors.white),
-              label: const Text(
-                'Nhập kho',
+              icon: Icon(
+                widget.isPosMode ? Icons.add_shopping_cart : Icons.inventory,
+                color: widget.isPosMode ? Colors.black : Colors.white,
+              ),
+              label: Text(
+                widget.isPosMode ? 'Thêm vào giỏ' : 'Nhập kho',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: widget.isPosMode ? Colors.black : Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),

@@ -353,7 +353,7 @@ class PosProvider extends ChangeNotifier {
 
     try {
       final response = await ApiService.post(
-        ApiConfig.paymentVnPayCreate(orderId),
+        '${ApiConfig.paymentVnPayCreate(orderId)}?clientHost=${ApiConfig.hostIP}',
         {},
       );
 

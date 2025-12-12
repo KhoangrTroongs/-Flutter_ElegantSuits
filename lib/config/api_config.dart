@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiConfig {
   // ========== CẤU HÌNH CHO ĐIỆN THOẠI THẬT ==========
@@ -10,7 +11,30 @@ class ApiConfig {
 
   // IP của máy tính chạy backend (lấy từ ipconfig)
   // Điện thoại và máy tính phải cùng mạng WiFi
-  static const String hostIP = '192.168.1.8';
+  static String hostIP = '192.168.1.5';
+
+  static const String _prefKeyHostIP = 'api_host_ip';
+
+  /// Khởi tạo config từ SharedPreferences
+  static Future<void> init() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedIP = prefs.getString(_prefKeyHostIP);
+      if (savedIP != null && savedIP.isNotEmpty) {
+        hostIP = savedIP;
+      }
+    } catch (e) {
+      debugPrint('Error loading API config: $e');
+    }
+  }
+
+  /// Cập nhật IP mới và lưu vào SharedPreferences
+  static Future<void> updateHostIP(String newIP) async {
+    if (newIP.isEmpty) return;
+    hostIP = newIP;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_prefKeyHostIP, newIP);
+  }
   // =================================================
 
   // Tự động phát hiện platform và sử dụng URL phù hợp
@@ -45,6 +69,9 @@ class ApiConfig {
 
     return 'http://localhost:$port/api';
   }
+
+  // SignalR Hub Endpoint
+  static String get hubUrl => baseUrl.replaceAll('/api', '/orderHub');
 
   // Auth endpoints
   static String get login => '$baseUrl/Auth/login';

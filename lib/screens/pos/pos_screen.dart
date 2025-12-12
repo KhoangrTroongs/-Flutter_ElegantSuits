@@ -932,7 +932,9 @@ class _PosScreenState extends State<PosScreen> {
   Future<void> _scanBarcode() async {
     final result = await Navigator.push<String>(
       context,
-      MaterialPageRoute(builder: (_) => const ScanBarcodeScreen()),
+      MaterialPageRoute(
+        builder: (_) => const ScanBarcodeScreen(isPosMode: true),
+      ),
     );
 
     if (result != null && mounted) {

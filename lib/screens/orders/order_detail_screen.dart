@@ -81,12 +81,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     switch (status.toLowerCase()) {
       case 'pending':
         return AppTheme.warningColor;
-      case 'processing':
+      case 'confirmed':
         return AppTheme.infoColor;
-      case 'completed':
+      case 'shipping':
+        return Colors.blue;
+      case 'delivered':
         return AppTheme.successColor;
       case 'cancelled':
         return AppTheme.errorColor;
+      case 'returned':
+        return Colors.purple;
       default:
         return AppTheme.textSecondary;
     }
@@ -96,12 +100,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     switch (status.toLowerCase()) {
       case 'pending':
         return Icons.schedule;
-      case 'processing':
+      case 'confirmed':
+        return Icons.thumb_up;
+      case 'shipping':
         return Icons.local_shipping;
-      case 'completed':
+      case 'delivered':
         return Icons.check_circle;
       case 'cancelled':
         return Icons.cancel;
+      case 'returned':
+        return Icons.assignment_return;
       default:
         return Icons.info;
     }
@@ -224,44 +232,60 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   const Divider(color: AppTheme.borderColor),
                   const SizedBox(height: 16),
                   // Status Dropdown
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Update Status:',
-                        style: TextStyle(color: AppTheme.textSecondary),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: AppTheme.backgroundColor,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppTheme.borderColor),
-                        ),
-                        child: _isUpdating
-                            ? const Padding(
-                                padding: EdgeInsets.all(8),
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppTheme.goldColor,
-                                  ),
-                                ),
-                              )
-                            : DropdownButton<String>(
-                                value: _order!.status,
-                                underline: const SizedBox(),
-                                dropdownColor: AppTheme.cardColor,
-                                items:
-                                    [
-                                          'Pending',
-                                          'Processing',
-                                          'Completed',
-                                          'Cancelled',
-                                        ]
+                  Builder(
+                    builder: (context) {
+                      // Map legacy statuses just in case of Hot Reload state mismatch
+                      String currentStatus = _order!.status;
+                      if (currentStatus == 'Processing')
+                        currentStatus = 'Confirmed';
+                      if (currentStatus == 'Shipped')
+                        currentStatus = 'Shipping';
+
+                      final validStatuses = [
+                        'Pending',
+                        'Confirmed',
+                        'Shipping',
+                        'Delivered',
+                        'Cancelled',
+                        'Returned',
+                      ];
+
+                      if (!validStatuses.contains(currentStatus)) {
+                        currentStatus = 'Pending';
+                      }
+
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Update Status:',
+                            style: TextStyle(color: AppTheme.textSecondary),
+                          ),
+                          const SizedBox(width: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: AppTheme.backgroundColor,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: AppTheme.borderColor),
+                            ),
+                            child: _isUpdating
+                                ? const Padding(
+                                    padding: EdgeInsets.all(8),
+                                    child: SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppTheme.goldColor,
+                                      ),
+                                    ),
+                                  )
+                                : DropdownButton<String>(
+                                    value: currentStatus,
+                                    underline: const SizedBox(),
+                                    dropdownColor: AppTheme.cardColor,
+                                    items: validStatuses
                                         .map(
                                           (s) => DropdownMenuItem(
                                             value: s,
@@ -269,13 +293,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                           ),
                                         )
                                         .toList(),
-                                onChanged: (v) =>
-                                    v != null && v != _order!.status
-                                    ? _updateStatus(v)
-                                    : null,
-                              ),
-                      ),
-                    ],
+                                    onChanged: (v) =>
+                                        v != null && v != _order!.status
+                                        ? _updateStatus(v)
+                                        : null,
+                                  ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),

@@ -11,10 +11,12 @@ import 'providers/coupon_provider.dart';
 import 'providers/inventory_provider.dart';
 import 'providers/pos_provider.dart';
 import 'services/inventory_service.dart';
+import 'services/signalr_service.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 import 'screens/inventory/inventory_screen.dart';
 import 'screens/pos/pos_screen.dart';
+import 'config/api_config.dart';
 
 /// HttpOverrides để bypass SSL certificate check trong development
 /// CHỈ SỬ DỤNG CHO DEVELOPMENT - KHÔNG DÙNG CHO PRODUCTION!
@@ -27,7 +29,12 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Load Global Config (IP Address, etc.)
+  await ApiConfig.init();
+
   // Bypass SSL certificate check cho development (Android Emulator, etc.)
   // Chỉ áp dụng cho non-web platforms
   if (!kIsWeb) {
@@ -53,6 +60,7 @@ class MyApp extends StatelessWidget {
           create: (_) => InventoryProvider(InventoryService()),
         ),
         ChangeNotifierProvider(create: (_) => PosProvider()),
+        ChangeNotifierProvider(create: (_) => SignalRService()),
       ],
       child: MaterialApp(
         title: 'Elegant Suits Admin',
