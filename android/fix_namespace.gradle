@@ -1,0 +1,18 @@
+subprojects {
+    if (project.name == 'flutter_webview_plugin_ios_android') {
+        try {
+            project.afterEvaluate { p ->
+                if (p.extensions.findByName("android") != null) {
+                    println "Applying namespace fix for ${p.name}"
+                    // Match the package in AndroidManifest.xml of the plugin
+                    p.android.namespace = 'com.flutter_webview_plugin'
+                }
+            }
+        } catch (Exception e) {
+            if (project.extensions.findByName("android") != null) {
+                 println "Applying namespace fix for ${project.name} (fallback)"
+                 project.android.namespace = 'com.flutter_webview_plugin'
+            }
+        }
+    }
+}
