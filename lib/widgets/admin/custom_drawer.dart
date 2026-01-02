@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
-import '../config/app_theme.dart';
-import '../screens/dashboard/dashboard_screen.dart';
-import '../screens/products/products_list_screen.dart';
-import '../screens/orders/orders_list_screen.dart';
-import '../screens/users/users_list_screen.dart';
-import '../screens/coupons/coupons_list_screen.dart';
-import '../screens/inventory/inventory_screen.dart';
-import '../screens/pos/pos_screen.dart';
+import '../../providers/auth_provider.dart';
+import '../../config/app_theme.dart';
+import '../../screens/admin/dashboard/dashboard_screen.dart';
+import '../../screens/admin/products/products_list_screen.dart';
+import '../../screens/admin/orders/orders_list_screen.dart';
+import '../../screens/admin/users/users_list_screen.dart';
+import '../../screens/admin/coupons/coupons_list_screen.dart';
+import '../../screens/admin/inventory/inventory_screen.dart';
+import '../../screens/admin/pos/pos_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});

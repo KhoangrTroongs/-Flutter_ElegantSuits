@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
-import '../../models/inventory_item.dart';
-import '../../providers/inventory_provider.dart';
+import '../../../models/inventory_item.dart';
+import '../../../providers/inventory_provider.dart';
 
 class ScanBarcodeScreen extends StatefulWidget {
   final bool isPosMode;

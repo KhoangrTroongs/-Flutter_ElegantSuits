@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../../models/inventory_item.dart';
-import '../../providers/inventory_provider.dart';
-import '../../widgets/custom_drawer.dart';
+import '../../../models/inventory_item.dart';
+import '../../../providers/inventory_provider.dart';
+import '../../../widgets/admin/custom_drawer.dart';
 import 'scan_barcode_screen.dart';
 
 // Format giá VNĐ

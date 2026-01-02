@@ -12,10 +12,10 @@ import 'providers/inventory_provider.dart';
 import 'providers/pos_provider.dart';
 import 'services/inventory_service.dart';
 import 'services/signalr_service.dart';
-import 'screens/auth/login_screen.dart';
-import 'screens/dashboard/dashboard_screen.dart';
-import 'screens/inventory/inventory_screen.dart';
-import 'screens/pos/pos_screen.dart';
+import 'screens/admin/auth/login_screen.dart';
+import 'screens/admin/dashboard/dashboard_screen.dart';
+import 'screens/admin/inventory/inventory_screen.dart';
+import 'screens/admin/pos/pos_screen.dart';
 import 'config/api_config.dart';
 
 /// HttpOverrides để bypass SSL certificate check trong development

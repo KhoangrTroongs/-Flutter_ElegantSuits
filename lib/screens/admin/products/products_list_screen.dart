@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../../providers/product_provider.dart';
-import '../../config/app_theme.dart';
+import '../../../providers/product_provider.dart';
+import '../../../config/app_theme.dart';
 import 'product_form_screen.dart';
 
 // Format giá VNĐ
