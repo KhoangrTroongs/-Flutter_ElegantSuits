@@ -4,7 +4,7 @@ import '../services/auth_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
-  
+
   User? _user;
   bool _isLoading = false;
   String? _error;
@@ -33,6 +33,24 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> register(Map<String, dynamic> data) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final success = await _authService.register(data);
+      _isLoading = false;
+      notifyListeners();
+      return success;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> logout() async {
     await _authService.logout();
     _user = null;
@@ -43,4 +61,3 @@ class AuthProvider extends ChangeNotifier {
     return await _authService.isLoggedIn();
   }
 }
-

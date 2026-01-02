@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../providers/auth_provider.dart';
-import '../../../config/app_theme.dart';
-import '../../../config/api_config.dart';
-import '../dashboard/dashboard_screen.dart';
+import '../../providers/auth_provider.dart';
+import '../../config/app_theme.dart';
+import '../../config/api_config.dart';
+import '../admin/dashboard/dashboard_screen.dart';
+import '../client/home_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -62,9 +64,13 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
       if (success && mounted) {
+        // Check role and navigate
+        final isAdmin = authProvider.user?.isAdmin ?? false;
+
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const DashboardScreen(),
+            pageBuilder: (_, __, ___) =>
+                isAdmin ? const DashboardScreen() : const ClientHomeScreen(),
             transitionsBuilder: (_, animation, __, child) {
               return FadeTransition(opacity: animation, child: child);
             },
@@ -215,15 +221,6 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
         ),
-        const SizedBox(height: 8),
-        Text(
-          'Admin Panel',
-          style: TextStyle(
-            fontSize: 14,
-            color: AppTheme.textMuted.withValues(alpha: 0.8),
-            letterSpacing: 2,
-          ),
-        ),
       ],
     );
   }
@@ -250,7 +247,7 @@ class _LoginScreenState extends State<LoginScreen>
             ),
             const SizedBox(height: 8),
             Text(
-              'Sign in to continue to dashboard',
+              'Sign in to continue',
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
@@ -345,6 +342,33 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                 ),
               ),
+            ),
+            const SizedBox(height: 24),
+            // Register Link
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Don't have an account? ",
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                    );
+                  },
+                  child: const Text(
+                    'Sign Up',
+                    style: TextStyle(
+                      color: AppTheme.goldColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -12,7 +12,8 @@ import 'providers/inventory_provider.dart';
 import 'providers/pos_provider.dart';
 import 'services/inventory_service.dart';
 import 'services/signalr_service.dart';
-import 'screens/admin/auth/login_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/client/home_screen.dart';
 import 'screens/admin/dashboard/dashboard_screen.dart';
 import 'screens/admin/inventory/inventory_screen.dart';
 import 'screens/admin/pos/pos_screen.dart';
@@ -71,6 +72,7 @@ class MyApp extends StatelessWidget {
           '/login': (context) => const LoginScreen(),
           '/dashboard': (context) => const DashboardScreen(),
           '/inventory': (context) => const InventoryScreen(),
+          '/client_home': (context) => const ClientHomeScreen(),
           '/pos': (context) => const PosScreen(),
         },
       ),
