@@ -11,6 +11,7 @@ import '../../providers/coupon_provider.dart';
 import '../auth/login_screen.dart';
 import '../../models/product.dart';
 import '../../models/coupon.dart';
+import 'product/product_detail_screen.dart';
 
 class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({super.key});
@@ -533,69 +534,68 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               ),
               child: Builder(
                 builder: (context) {
-                  final imageUrl = product.fullImageUrl;
-                  // Debug print URL
-                  // print('Product ID: ${product.id}, URL: $imageUrl');
-
-                  if (imageUrl != null) {
-                    return CachedNetworkImage(
-                      imageUrl: imageUrl,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      placeholder: (context, url) => Container(
-                        color: Colors.grey[200],
-                        child: const Center(child: CircularProgressIndicator()),
-                      ),
-                      errorWidget: (context, url, error) {
-                        // Debug print error
-                        debugPrint(
-                          'Error loading image for product ${product.id}: $url',
-                        );
-                        debugPrint('Error details: $error');
-                        return Container(
-                          color: Colors.grey[200],
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.broken_image,
-                                color: Colors.grey,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Error',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.grey[600],
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProductDetailScreen(product: product),
+                        ),
+                      );
+                    },
+                    child: Builder(
+                      builder: (context) {
+                        final imageUrl = product.fullImageUrl;
+                        
+                        if (imageUrl != null) {
+                          return CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            placeholder: (context, url) => Container(
+                              color: Colors.grey[200],
+                              child: const Center(child: CircularProgressIndicator()),
+                            ),
+                            errorWidget: (context, url, error) {
+                              debugPrint('Error loading image for product ${product.id}: $url');
+                              debugPrint('Error details: $error');
+                              return Container(
+                                color: Colors.grey[200],
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.broken_image, color: Colors.grey),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Error',
+                                      style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                              );
+                            },
+                          );
+                        }
+
+                        return Image.asset(
+                          'assets/images/placeholder.png',
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: Colors.grey[200],
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
+                                Text(
+                                  'No Image',
+                                  style: TextStyle(fontSize: 10, color: Colors.grey),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },
-                    );
-                  }
-
-                  return Image.asset(
-                    'assets/images/placeholder.png',
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: Colors.grey[200],
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.image_not_supported,
-                            size: 40,
-                            color: Colors.grey,
-                          ),
-                          Text(
-                            'No Image',
-                            style: TextStyle(fontSize: 10, color: Colors.grey),
-                          ),
-                        ],
-                      ),
                     ),
                   );
                 },
