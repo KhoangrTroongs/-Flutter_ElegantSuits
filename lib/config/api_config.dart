@@ -11,7 +11,7 @@ class ApiConfig {
 
   // IP của máy tính chạy backend (lấy từ ipconfig)
   // Điện thoại và máy tính phải cùng mạng WiFi
-  static String hostIP = '192.168.1.5';
+  static String hostIP = '192.168.1.10';
 
   static const String _prefKeyHostIP = 'api_host_ip';
 
@@ -70,6 +70,11 @@ class ApiConfig {
     return 'http://localhost:$port/api';
   }
 
+  // Base URL cho ảnh (bỏ /api và đảm bảo sử dụng cùng host/port)
+  static String get imageBaseUrl {
+    final apiBase = baseUrl;
+    return apiBase.replaceAll('/api', '');
+  }
   // SignalR Hub Endpoint
   static String get hubUrl => baseUrl.replaceAll('/api', '/orderHub');
 
