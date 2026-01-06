@@ -85,6 +85,7 @@ class ApiConfig {
   // Products endpoints
   static String get products => '$baseUrl/Products';
   static String productById(int id) => '$baseUrl/Products/$id';
+  static String productReviews(int id) => '$baseUrl/Products/$id/reviews';
   static String get productsPaged => '$baseUrl/Products/paged';
   static String get productsSearch => '$baseUrl/Products/search';
   static String productUploadImage(int id) =>
