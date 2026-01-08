@@ -157,9 +157,11 @@ class ApiService {
     return await http.Response.fromStream(streamedResponse);
   }
 
-  static Map<String, dynamic> parseResponse(http.Response response) {
+  static dynamic parseResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return jsonDecode(response.body);
+      final decoded = jsonDecode(response.body);
+      // print('DEBUG: API Response Body: $decoded');
+      return decoded;
     } else {
       throw Exception('API Error: ${response.statusCode} - ${response.body}');
     }

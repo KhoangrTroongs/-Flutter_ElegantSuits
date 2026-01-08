@@ -7,7 +7,7 @@ class ApiConfig {
   // Đặt true nếu đang test trên điện thoại thật (kết nối cùng mạng WiFi)
   // Đặt false nếu đang test trên Emulator
   static const bool useRealDevice =
-      true; // Đổi thành true khi test trên điện thoại thật
+      false; // Đổi thành true khi test trên điện thoại thật
 
   // IP của máy tính chạy backend (lấy từ ipconfig)
   // Điện thoại và máy tính phải cùng mạng WiFi
@@ -75,6 +75,7 @@ class ApiConfig {
     final apiBase = baseUrl;
     return apiBase.replaceAll('/api', '');
   }
+
   // SignalR Hub Endpoint
   static String get hubUrl => baseUrl.replaceAll('/api', '/orderHub');
 
@@ -92,6 +93,7 @@ class ApiConfig {
       '$baseUrl/Products/$id/upload-image';
   static String get productUploadTempImage =>
       '$baseUrl/Products/upload-temp-image';
+  static String get productReview => '$baseUrl/Products/review';
 
   // Orders endpoints
   static String get orders => '$baseUrl/Orders';
@@ -131,6 +133,10 @@ class ApiConfig {
   static String paymentStatus(int orderId) =>
       '$baseUrl/PaymentApi/status/$orderId';
   static String paymentCash(int orderId) => '$baseUrl/PaymentApi/cash/$orderId';
+
+  // Cart endpoints
+  static String get cart => '$baseUrl/Cart';
+  static String cartRemoveItem(int cartItemId) => '$baseUrl/Cart/$cartItemId';
 
   // Timeout
   static const Duration timeout = Duration(seconds: 30);

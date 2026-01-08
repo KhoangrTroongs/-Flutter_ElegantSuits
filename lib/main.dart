@@ -9,9 +9,10 @@ import 'providers/order_provider.dart';
 import 'providers/user_provider.dart';
 import 'providers/coupon_provider.dart';
 import 'providers/inventory_provider.dart';
-import 'providers/pos_provider.dart';
+import 'providers/cart_provider.dart'; // Import CartProvider
 import 'services/inventory_service.dart';
 import 'services/signalr_service.dart';
+import 'providers/pos_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/client/home_screen.dart';
 import 'screens/admin/dashboard/dashboard_screen.dart';
@@ -62,6 +63,7 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(create: (_) => PosProvider()),
         ChangeNotifierProvider(create: (_) => SignalRService()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: MaterialApp(
         title: 'Elegant Suits Admin',
@@ -126,13 +128,13 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(milliseconds: 2000));
     if (mounted) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final isLoggedIn = await authProvider.checkAuth();
+      await authProvider.checkAuth();
 
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                isLoggedIn ? const DashboardScreen() : const LoginScreen(),
+                const LoginScreen(), // Always show login screen first per user request
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
                   return FadeTransition(opacity: animation, child: child);
