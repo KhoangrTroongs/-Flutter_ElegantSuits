@@ -48,11 +48,24 @@ class Order {
       discountAmount: (json['DiscountAmount'] ?? json['discountAmount'] ?? 0)
           .toDouble(),
       paymentMethod: json['PaymentMethod'] ?? json['paymentMethod'],
-      paymentStatus: json['PaymentStatus'] ?? json['paymentStatus'],
+      paymentStatus: _parsePaymentStatus(
+        json['PaymentStatus'] ?? json['paymentStatus'],
+      ),
       items: itemsList != null
           ? (itemsList as List).map((i) => OrderItem.fromJson(i)).toList()
           : null,
     );
+  }
+
+  static String _parsePaymentStatus(dynamic status) {
+    if (status is int) {
+      // 0=Pending, 1=Paid, 2=Failed
+      const statusNames = ['Pending', 'Paid', 'Failed'];
+      return status >= 0 && status < statusNames.length
+          ? statusNames[status]
+          : 'Unknown';
+    }
+    return status?.toString() ?? 'Pending';
   }
 
   static String _parseStatus(dynamic status) {
