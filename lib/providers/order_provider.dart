@@ -29,6 +29,21 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> fetchMyOrders() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _orders = await _orderService.getMyOrders();
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<Order?> getOrderById(int id) async {
     try {
       return await _orderService.getOrderById(id);
@@ -55,4 +70,3 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 }
-

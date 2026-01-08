@@ -8,6 +8,10 @@ class Order {
   final String? shippingAddress;
   final String? notes;
   final List<OrderItem>? items;
+  final String? couponCode;
+  final double discountAmount;
+  final String? paymentMethod;
+  final String? paymentStatus;
 
   Order({
     required this.id,
@@ -19,6 +23,10 @@ class Order {
     this.shippingAddress,
     this.notes,
     this.items,
+    this.couponCode,
+    this.discountAmount = 0,
+    this.paymentMethod,
+    this.paymentStatus,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
@@ -36,6 +44,11 @@ class Order {
       orderDate: DateTime.parse(json['OrderDate'] ?? json['orderDate']),
       shippingAddress: json['ShippingAddress'] ?? json['shippingAddress'],
       notes: json['Notes'] ?? json['notes'],
+      couponCode: json['CouponCode'] ?? json['couponCode'],
+      discountAmount: (json['DiscountAmount'] ?? json['discountAmount'] ?? 0)
+          .toDouble(),
+      paymentMethod: json['PaymentMethod'] ?? json['paymentMethod'],
+      paymentStatus: json['PaymentStatus'] ?? json['paymentStatus'],
       items: itemsList != null
           ? (itemsList as List).map((i) => OrderItem.fromJson(i)).toList()
           : null,

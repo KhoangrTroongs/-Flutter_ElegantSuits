@@ -48,6 +48,22 @@ class OrderService {
     }
   }
 
+  Future<List<Order>> getMyOrders() async {
+    try {
+      final response = await ApiService.get(ApiConfig.myOrders);
+      final data = ApiService.parseResponse(response);
+
+      if (_isSuccess(data) && _getData(data) != null) {
+        return (_getData(data) as List)
+            .map((json) => Order.fromJson(json))
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Error fetching my orders: $e');
+    }
+  }
+
   Future<Order> getOrderById(int id) async {
     try {
       final response = await ApiService.get(ApiConfig.orderById(id));

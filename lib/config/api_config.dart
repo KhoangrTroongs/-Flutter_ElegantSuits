@@ -100,6 +100,7 @@ class ApiConfig {
   static String orderById(int id) => '$baseUrl/Orders/$id';
   static String orderStatus(int id) => '$baseUrl/Orders/$id/status';
   static String get posOrder => '$baseUrl/Orders/pos';
+  static String get myOrders => '$baseUrl/Orders/my-orders';
 
   // Users endpoints
   static String get users => '$baseUrl/Users';
