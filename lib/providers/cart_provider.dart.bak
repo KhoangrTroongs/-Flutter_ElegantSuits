@@ -137,47 +137,4 @@ class CartProvider with ChangeNotifier {
       rethrow;
     }
   }
-
-  // Checkout
-  Future<Map<String, dynamic>> checkout({
-    required String shippingAddress,
-    String? notes,
-    String? couponCode,
-    String paymentMethod = 'COD',
-  }) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      final body = {
-        'shippingAddress': shippingAddress,
-        'notes': notes,
-        'couponCode': couponCode,
-        'paymentMethod': paymentMethod,
-      };
-
-      final response = await ApiService.post(ApiConfig.orders, body);
-      final data = ApiService.parseResponse(response);
-
-      if (data is Map &&
-          (data['isSuccess'] == true || data['IsSuccess'] == true)) {
-        // Order created successfully
-        // Backend clears cart on success?
-        // If not, clear local cart or refetch.
-        // Based on OrderService, backend calls _cartService.ClearCartAsync(userId).
-        // So we just need to refresh local cart (it should be empty).
-        await fetchCart();
-        return {'success': true, 'data': data['data'] ?? data['Data']};
-      } else {
-        throw Exception(data['message'] ?? 'Checkout failed');
-      }
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-      return {'success': false, 'message': e.toString()};
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
 }

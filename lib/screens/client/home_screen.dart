@@ -12,6 +12,8 @@ import '../auth/login_screen.dart';
 import '../../models/product.dart';
 import '../../models/coupon.dart';
 import 'product/product_detail_screen.dart';
+import 'order/order_history_screen.dart';
+import 'cart/cart_screen.dart';
 
 class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({super.key});
@@ -59,9 +61,21 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         centerTitle: true,
         actions: [
           IconButton(
+            icon: const Icon(Icons.receipt_long),
+            tooltip: 'Lịch sử mua hàng',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const OrderHistoryScreen()),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.shopping_bag_outlined),
             onPressed: () {
               // Navigate to Cart
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const CartScreen()));
             },
           ),
           IconButton(
@@ -539,14 +553,15 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProductDetailScreen(product: product),
+                          builder: (context) =>
+                              ProductDetailScreen(product: product),
                         ),
                       );
                     },
                     child: Builder(
                       builder: (context) {
                         final imageUrl = product.fullImageUrl;
-                        
+
                         if (imageUrl != null) {
                           return CachedNetworkImage(
                             imageUrl: imageUrl,
@@ -554,21 +569,31 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                             width: double.infinity,
                             placeholder: (context, url) => Container(
                               color: Colors.grey[200],
-                              child: const Center(child: CircularProgressIndicator()),
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
                             ),
                             errorWidget: (context, url, error) {
-                              debugPrint('Error loading image for product ${product.id}: $url');
+                              debugPrint(
+                                'Error loading image for product ${product.id}: $url',
+                              );
                               debugPrint('Error details: $error');
                               return Container(
                                 color: Colors.grey[200],
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.broken_image, color: Colors.grey),
+                                    const Icon(
+                                      Icons.broken_image,
+                                      color: Colors.grey,
+                                    ),
                                     const SizedBox(height: 4),
                                     Text(
                                       'Error',
-                                      style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey[600],
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -586,10 +611,17 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                             child: const Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
+                                Icon(
+                                  Icons.image_not_supported,
+                                  size: 40,
+                                  color: Colors.grey,
+                                ),
                                 Text(
                                   'No Image',
-                                  style: TextStyle(fontSize: 10, color: Colors.grey),
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ],
                             ),

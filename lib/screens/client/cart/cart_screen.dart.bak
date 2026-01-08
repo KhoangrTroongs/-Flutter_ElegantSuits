@@ -4,8 +4,6 @@ import 'package:intl/intl.dart';
 import '../../../providers/cart_provider.dart';
 import '../../../models/api_cart.dart';
 import '../../../config/api_config.dart';
-import '../../../services/api_service.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -24,85 +22,13 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
-  // Checkout logic variables
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _noteController = TextEditingController();
-  final TextEditingController _couponController = TextEditingController();
-  String _selectedPaymentMethod = 'COD';
-
-  @override
-  void dispose() {
-    _addressController.dispose();
-    _noteController.dispose();
-    _couponController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _initiateVnPay(BuildContext context, int orderId) async {
-    try {
-      final response = await ApiService.post(
-        ApiConfig.paymentVnPayCreate(orderId),
-        {},
-      );
-
-      final data = ApiService.parseResponse(response);
-
-      if (data is Map &&
-          (data['isSuccess'] == true || data['IsSuccess'] == true)) {
-        final paymentUrl = data['data'] ?? data['Data'];
-
-        if (paymentUrl != null && await canLaunchUrl(Uri.parse(paymentUrl))) {
-          await launchUrl(
-            Uri.parse(paymentUrl),
-            mode: LaunchMode.externalApplication,
-          );
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Đang chuyển hướng đến VNPay...'),
-              backgroundColor: Colors.blue,
-            ),
-          );
-          // Optionally navigate back or to order success
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        } else {
-          // Fallback to dialog if cannot launch
-          if (!mounted) return;
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Thanh toán VNPay'),
-              content: SelectableText(
-                'Vui lòng mở link sau để thanh toán:\n$paymentUrl',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                  },
-                  child: const Text('Đã hoàn tất'),
-                ),
-              ],
-            ),
-          );
-        }
-      } else {
-        throw Exception(data['message'] ?? 'Cannot create VNPay payment');
-      }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi VNPay: $e'), backgroundColor: Colors.red),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     // Currency format
     final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.grey[50], // Slightly off-white background
       appBar: AppBar(
         title: const Text(
           'Giỏ hàng',
@@ -215,7 +141,7 @@ class _CartScreenState extends State<CartScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Image.network(
-              '${ApiConfig.imageBaseUrl}${item.imageUrl}',
+              '${ApiConfig.imageBaseUrl}${item.imageUrl}', // Append Base URL correctly
               width: 90,
               height: 90,
               fit: BoxFit.cover,
@@ -379,7 +305,15 @@ class _CartScreenState extends State<CartScreen> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () => _showCheckoutModal(context, cart, format),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Chức năng thanh toán đang được phát triển...',
+                      ),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   elevation: 5,
@@ -402,225 +336,6 @@ class _CartScreenState extends State<CartScreen> {
         ),
       ),
     );
-  }
-
-  void _showCheckoutModal(
-    BuildContext context,
-    ApiCart cart,
-    NumberFormat format,
-  ) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-                left: 20,
-                right: 20,
-                top: 20,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 50,
-                        height: 5,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Thông tin đặt hàng',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Address
-                    TextField(
-                      controller: _addressController,
-                      decoration: InputDecoration(
-                        labelText: 'Địa chỉ giao hàng',
-                        prefixIcon: const Icon(Icons.location_on_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Coupon
-                    TextField(
-                      controller: _couponController,
-                      decoration: InputDecoration(
-                        labelText: 'Mã giảm giá (nếu có)',
-                        prefixIcon: const Icon(Icons.discount_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Notes
-                    TextField(
-                      controller: _noteController,
-                      maxLines: 2,
-                      decoration: InputDecoration(
-                        labelText: 'Ghi chú',
-                        prefixIcon: const Icon(Icons.note_alt_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Phương thức thanh toán',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    // Payment Methods
-                    _buildPaymentOption(
-                      'COD',
-                      'Thanh toán khi nhận hàng',
-                      setState,
-                    ),
-                    _buildPaymentOption(
-                      'VnPay',
-                      'Thanh toán qua VNPay',
-                      setState,
-                    ),
-                    const SizedBox(height: 20),
-                    // Place Order Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (_addressController.text.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Vui lòng nhập địa chỉ giao hàng',
-                                ),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
-                          }
-                          Navigator.pop(context); // Close modal
-                          _processCheckout(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'ĐẶT HÀNG',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildPaymentOption(String value, String title, StateSetter setState) {
-    return RadioListTile<String>(
-      title: Text(title),
-      value: value,
-      groupValue: _selectedPaymentMethod,
-      activeColor: Colors.black,
-      contentPadding: EdgeInsets.zero,
-      onChanged: (String? val) {
-        if (val != null) {
-          setState(() {
-            _selectedPaymentMethod = val;
-          });
-        }
-      },
-    );
-  }
-
-  Future<void> _processCheckout(BuildContext context) async {
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
-
-    try {
-      final result = await cartProvider.checkout(
-        shippingAddress: _addressController.text,
-        notes: _noteController.text,
-        couponCode: _couponController.text,
-        paymentMethod: _selectedPaymentMethod,
-      );
-
-      if (!mounted) return;
-
-      if (result['success'] == true) {
-        if (_selectedPaymentMethod == 'VnPay') {
-          // Note: In a real app, you would handle the redirect URL here if provided only by Order response
-          // But usually VNPay flow might require a separate call or the CreateOrder returns the URL.
-          // Our CreateOrder implementation returns the Order object.
-          // We might need to call PaymentApi/vnpay/create/{orderId} separately?
-          // Let's check api_config.
-          // api_config has: paymentVnPayCreate(int orderId)
-
-          final orderData = result['data'];
-          final orderId = orderData['id'] ?? orderData['Id'];
-
-          // Call VNPay API
-          await _initiateVnPay(context, orderId);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Đặt hàng thành công!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          // Navigate to home or order list
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result['message'] ?? 'Đặt hàng thất bại'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
-      );
-    }
   }
 
   Future<void> _showRemoveConfirmDialog(
