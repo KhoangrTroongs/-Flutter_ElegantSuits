@@ -359,6 +359,85 @@ class _LoginScreenState extends State<LoginScreen>
               ),
             ),
             const SizedBox(height: 24),
+            // Google Login Button
+            Consumer<AuthProvider>(
+              builder: (context, auth, _) => OutlinedButton(
+                onPressed: auth.isLoading
+                    ? null
+                    : () async {
+                        final success = await auth.loginWithGoogle();
+                        if (success && mounted) {
+                          // Check role and navigate (duplicated from _login for now)
+                          final isAdmin = auth.user?.isAdmin ?? false;
+
+                          Navigator.of(context).pushReplacement(
+                            PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => isAdmin
+                                  ? const DashboardScreen()
+                                  : const ClientHomeScreen(),
+                              transitionsBuilder: (_, animation, __, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
+                              transitionDuration: const Duration(
+                                milliseconds: 500,
+                              ),
+                            ),
+                          );
+                        } else if (mounted && auth.error != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.error_outline,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(child: Text(auth.error!)),
+                                ],
+                              ),
+                              backgroundColor: AppTheme.errorColor,
+                            ),
+                          );
+                        }
+                      },
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  side: const BorderSide(color: Colors.grey),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    // Simple G icon since no asset available
+                    Text(
+                      'G',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.red,
+                        fontFamily: 'serif',
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Text(
+                      'Đăng nhập bằng Google',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
             // Register Link
             Row(
               mainAxisAlignment: MainAxisAlignment.center,

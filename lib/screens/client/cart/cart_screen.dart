@@ -5,6 +5,8 @@ import '../../../providers/cart_provider.dart';
 import '../../../models/api_cart.dart';
 import '../../../config/api_config.dart';
 import '../../../services/api_service.dart';
+import '../../../providers/auth_provider.dart';
+import '../../auth/login_screen.dart';
 
 import '../../../providers/coupon_provider.dart';
 import '../../../models/coupon.dart';
@@ -22,9 +24,12 @@ class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch cart when screen loads
+    // Fetch cart when screen loads ONLY if authenticated
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<CartProvider>(context, listen: false).fetchCart();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.isAuthenticated) {
+        Provider.of<CartProvider>(context, listen: false).fetchCart();
+      }
     });
   }
 
@@ -127,6 +132,7 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     // Currency format
     final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
+    final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -140,30 +146,106 @@ class _CartScreenState extends State<CartScreen> {
         iconTheme: const IconThemeData(color: Colors.black),
         centerTitle: true,
       ),
-      body: Consumer<CartProvider>(
-        builder: (context, cartProvider, child) {
-          if (cartProvider.isLoading && cartProvider.cart == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: authProvider.isAuthenticated
+          ? Consumer<CartProvider>(
+              builder: (context, cartProvider, child) {
+                if (cartProvider.isLoading && cartProvider.cart == null) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-          if (cartProvider.cart == null || cartProvider.cart!.items.isEmpty) {
-            return Center(
+                if (cartProvider.cart == null ||
+                    cartProvider.cart!.items.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.shopping_bag_outlined,
+                          size: 80,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Giỏ hàng của bạn đang trống',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: const Text(
+                            'TIẾP TỤC MUA SẮM',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                final cart = cartProvider.cart!;
+
+                return Column(
+                  children: [
+                    // Cart Items List
+                    Expanded(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 20,
+                        ),
+                        itemCount: cart.items.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 16),
+                        itemBuilder: (context, index) {
+                          final item = cart.items[index];
+                          return _buildCartItem(
+                            context,
+                            item,
+                            cartProvider,
+                            currencyFormat,
+                          );
+                        },
+                      ),
+                    ),
+                    // Bottom Checkout Bar
+                    _buildBottomBar(context, cart, currencyFormat),
+                  ],
+                );
+              },
+            )
+          : Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.shopping_bag_outlined,
-                    size: 80,
-                    color: Colors.grey[300],
-                  ),
+                  Icon(Icons.lock_outline, size: 80, color: Colors.grey[300]),
                   const SizedBox(height: 16),
                   Text(
-                    'Giỏ hàng của bạn đang trống',
+                    'Vui lòng đăng nhập để xem giỏ hàng',
                     style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Đăng nhập để thêm sản phẩm vào giỏ hàng',
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(
@@ -175,45 +257,13 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                     ),
                     child: const Text(
-                      'TIẾP TỤC MUA SẮM',
+                      'ĐĂNG NHẬP NGAY',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
               ),
-            );
-          }
-
-          final cart = cartProvider.cart!;
-
-          return Column(
-            children: [
-              // Cart Items List
-              Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 20,
-                  ),
-                  itemCount: cart.items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 16),
-                  itemBuilder: (context, index) {
-                    final item = cart.items[index];
-                    return _buildCartItem(
-                      context,
-                      item,
-                      cartProvider,
-                      currencyFormat,
-                    );
-                  },
-                ),
-              ),
-              // Bottom Checkout Bar
-              _buildBottomBar(context, cart, currencyFormat),
-            ],
-          );
-        },
-      ),
+            ),
     );
   }
 
@@ -1074,6 +1124,23 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                       );
                     }
+
+                    // Sort coupons: Valid first
+                    coupons.sort((a, b) {
+                      final aValid =
+                          !((a.expiryDate != null &&
+                                  a.expiryDate!.isBefore(DateTime.now())) ||
+                              a.quantity == 0 ||
+                              cart.totalPrice < a.minimumAmount);
+                      final bValid =
+                          !((b.expiryDate != null &&
+                                  b.expiryDate!.isBefore(DateTime.now())) ||
+                              b.quantity == 0 ||
+                              cart.totalPrice < b.minimumAmount);
+                      if (aValid && !bValid) return -1;
+                      if (!aValid && bValid) return 1;
+                      return 0;
+                    });
 
                     return ListView.separated(
                       itemCount: coupons.length,

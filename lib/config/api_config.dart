@@ -7,7 +7,7 @@ class ApiConfig {
   // Đặt true nếu đang test trên điện thoại thật (kết nối cùng mạng WiFi)
   // Đặt false nếu đang test trên Emulator
   static const bool useRealDevice =
-      false; // Đổi thành true khi test trên điện thoại thật
+      true; // Đổi thành true khi test trên điện thoại thật
 
   // IP của máy tính chạy backend (lấy từ ipconfig)
   // Điện thoại và máy tính phải cùng mạng WiFi
@@ -81,6 +81,7 @@ class ApiConfig {
 
   // Auth endpoints
   static String get login => '$baseUrl/Auth/login';
+  static String get loginWithGoogle => '$baseUrl/Auth/google-login';
   static String get register => '$baseUrl/Auth/register';
 
   // Products endpoints

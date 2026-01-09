@@ -33,6 +33,28 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> loginWithGoogle() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final response = await _authService.loginWithGoogle();
+      _user = response.user;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      // Don't set error if cancelled
+      if (!e.toString().contains('Cancelled')) {
+        _error = e.toString();
+      }
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<bool> register(Map<String, dynamic> data) async {
     _isLoading = true;
     _error = null;
