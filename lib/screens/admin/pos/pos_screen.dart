@@ -9,6 +9,8 @@ import '../../../config/api_config.dart';
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import '../inventory/scan_barcode_screen.dart';
+import '../../client/payment/payment_webview_screen.dart';
+import '../../../widgets/payment_success_dialog.dart';
 
 // Format giá VNĐ
 String formatVND(double price) {
@@ -1102,21 +1104,32 @@ class _PosScreenState extends State<PosScreen> {
         // Thanh toán VNPay
         final payUrl = await provider.createVnPayPayment(orderId);
         if (payUrl != null && mounted) {
-          // Mở URL VNPay trong browser
-          final uri = Uri.parse(payUrl);
-          final canLaunch = await canLaunchUrl(uri);
+           final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PaymentWebViewScreen(
+                paymentUrl: payUrl,
+                title: 'Thanh toán VNPay',
+              ),
+            ),
+          );
+
           if (!mounted) return;
 
-          if (canLaunch) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-            if (!mounted) return;
-
-            // Show dialog to check payment completion
-            _showPaymentConfirmationDialog(provider, orderId);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Không thể mở trang thanh toán')),
-            );
+           if (result != null && result is Map) {
+            final status = result['status'];
+            if (status == 'success') {
+               _showSuccessDialog(orderId, 'VNPay');
+               provider.reset();
+               provider.selectGuestCustomer();
+            } else {
+               ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Thanh toán thất bại: $status'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           }
         } else if (mounted && provider.error != null) {
           ScaffoldMessenger.of(
@@ -1131,165 +1144,17 @@ class _PosScreenState extends State<PosScreen> {
     }
   }
 
-  /// Hiển thị dialog thành công
   void _showSuccessDialog(int orderId, String paymentMethod) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-        title: Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.green[400], size: 28),
-            const SizedBox(width: 12),
-            const Expanded(
-              child: Text(
-                'Thanh toán thành công!',
-                style: TextStyle(
-                  color: AppTheme.textPrimary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 8),
-            Text(
-              'Đơn hàng #$orderId',
-              style: const TextStyle(
-                color: AppTheme.goldColor,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const Icon(
-                  Icons.payment,
-                  size: 16,
-                  color: AppTheme.textSecondary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Phương thức: $paymentMethod',
-                  style: const TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.goldColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Đóng',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-            ),
-          ),
-        ],
+      builder: (context) => PaymentSuccessDialog(
+        orderId: orderId,
+        paymentMethod: paymentMethod,
+        onPressed: () => Navigator.pop(context),
       ),
     );
   }
 
-  /// Hiển thị dialog xác nhận thanh toán VNPay
-  void _showPaymentConfirmationDialog(PosProvider provider, int orderId) {
-    Timer? timer;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        // Tự động kiểm tra sau mỗi 3 giây
-        timer = Timer.periodic(const Duration(seconds: 3), (t) async {
-          final statusData = await provider.checkPaymentStatus(orderId);
-          if (statusData != null && statusData['isPaid'] == true) {
-            t.cancel();
-            if (context.mounted) {
-              Navigator.pop(context); // Close dialog
-              _showSuccessDialog(orderId, 'VNPay');
-              provider.reset();
-              provider.selectGuestCustomer();
-            }
-          }
-        });
 
-        return AlertDialog(
-          backgroundColor: AppTheme.cardColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Row(
-            children: [
-              const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: AppTheme.goldColor,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'Đang chờ thanh toán...',
-                style: TextStyle(color: AppTheme.textPrimary),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Vui lòng hoàn tất thanh toán trên ứng dụng VNPay hoặc trình duyệt.',
-                style: TextStyle(color: AppTheme.textSecondary),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Hệ thống sẽ tự động xác nhận khi nhận được thanh toán.',
-                style: TextStyle(
-                  color: AppTheme.textSecondary.withValues(alpha: 0.7),
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                timer?.cancel();
-                Navigator.pop(context);
-              },
-              child: const Text(
-                'Hủy / Để sau',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-          ],
-        );
-      },
-    ).then((_) => timer?.cancel());
-  }
 }
