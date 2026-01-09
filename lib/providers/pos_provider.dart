@@ -352,8 +352,11 @@ class PosProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      String clientHost = ApiConfig.useRealDevice
+          ? ApiConfig.hostIP
+          : '10.0.2.2';
       final response = await ApiService.post(
-        '${ApiConfig.paymentVnPayCreate(orderId)}?clientHost=${ApiConfig.hostIP}',
+        '${ApiConfig.paymentVnPayCreate(orderId)}?clientHost=$clientHost',
         {},
       );
 

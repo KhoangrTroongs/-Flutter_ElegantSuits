@@ -8,6 +8,7 @@ import '../../../services/api_service.dart';
 
 import '../../../providers/coupon_provider.dart';
 import '../../../models/coupon.dart';
+import '../../../widgets/payment_success_dialog.dart';
 import '../payment/payment_webview_screen.dart';
 
 class CartScreen extends StatefulWidget {
@@ -43,8 +44,11 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> _initiateVnPay(BuildContext context, int orderId) async {
     try {
+      String clientHost = ApiConfig.useRealDevice
+          ? ApiConfig.hostIP
+          : '10.0.2.2';
       final response = await ApiService.post(
-        ApiConfig.paymentVnPayCreate(orderId),
+        '${ApiConfig.paymentVnPayCreate(orderId)}?clientHost=$clientHost',
         {},
       );
 
@@ -72,13 +76,22 @@ class _CartScreenState extends State<CartScreen> {
           if (result != null && result is Map) {
             final status = result['status'];
             if (status == 'success') {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Thanh toán thành công!'),
-                  backgroundColor: Colors.green,
+              // Show success dialog
+              if (!mounted) return;
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => PaymentSuccessDialog(
+                  orderId: orderId,
+                  paymentMethod: 'VNPay',
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close dialog
+                    Navigator.of(
+                      context,
+                    ).popUntil((route) => route.isFirst); // Go home
+                  },
                 ),
               );
-              Navigator.of(context).popUntil((route) => route.isFirst);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
