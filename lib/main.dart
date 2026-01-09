@@ -131,10 +131,11 @@ class _SplashScreenState extends State<SplashScreen>
       await authProvider.checkAuth();
 
       if (mounted) {
+        // Navigate to ClientHomeScreen as the initial screen for everyone (Guest/User)
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                const LoginScreen(), // Always show login screen first per user request
+                const ClientHomeScreen(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
                   return FadeTransition(opacity: animation, child: child);

@@ -128,6 +128,21 @@ class _LoginScreenState extends State<LoginScreen>
               ),
               Positioned(
                 top: 10,
+                left: 10,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white54),
+                  tooltip: 'Back to Home',
+                  onPressed: () {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (_) => const ClientHomeScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Positioned(
+                top: 10,
                 right: 10,
                 child: IconButton(
                   icon: const Icon(Icons.settings, color: Colors.white54),

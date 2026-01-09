@@ -597,6 +597,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               onTap: isOutOfStock
                   ? null
                   : () {
+                      final authProvider = Provider.of<AuthProvider>(
+                        context,
+                        listen: false,
+                      );
+                      if (!authProvider.isAuthenticated) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text(
+                              'Vui lòng đăng nhập để chọn size và mua hàng',
+                            ),
+                            action: SnackBarAction(
+                              label: 'ĐĂNG NHẬP',
+                              textColor: AppTheme.goldColor,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LoginScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+
                       setState(() {
                         // Toggle selection if needed, or just select
                         _selectedSize = size;
@@ -928,71 +955,99 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ],
       ),
       child: SafeArea(
-        child: Row(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.remove),
-                    onPressed: _quantity > 1 && !isOutOfStock
-                        ? () => setState(() => _quantity--)
-                        : null,
+        child: Consumer<AuthProvider>(
+          builder: (context, authProvider, _) {
+            final isAuth = authProvider.isAuthenticated;
+
+            return Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  Text(
-                    '$_quantity',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.remove),
+                        onPressed: _quantity > 1 && !isOutOfStock && isAuth
+                            ? () => setState(() => _quantity--)
+                            : null,
+                      ),
+                      Text(
+                        '$_quantity',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: !isOutOfStock && isAuth
+                            ? () => setState(() => _quantity++)
+                            : null,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: isOutOfStock
+                        ? null
+                        : (!isAuth
+                              ? () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const LoginScreen(),
+                                    ),
+                                  );
+                                }
+                              : (_availableSizes.isNotEmpty &&
+                                        _selectedSize == null
+                                    ? () {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Vui lòng chọn kích cỡ',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    : _addToCart)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isOutOfStock
+                          ? Colors.grey
+                          : (isAuth
+                                ? AppTheme.primaryColor
+                                : AppTheme.goldColor),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      isOutOfStock
+                          ? "Hết hàng"
+                          : (isAuth ? "Thêm vào giỏ hàng" : "Đăng nhập để mua"),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isOutOfStock
+                            ? Colors.white54
+                            : (isAuth
+                                  ? AppTheme.goldColor
+                                  : AppTheme.primaryColor),
+                      ),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: !isOutOfStock
-                        ? () => setState(() => _quantity++)
-                        : null,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: isOutOfStock
-                    ? null
-                    : (_availableSizes.isNotEmpty && _selectedSize == null
-                          ? () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Vui lòng chọn kích cỡ'),
-                                ),
-                              );
-                            }
-                          : _addToCart),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isOutOfStock
-                      ? Colors.grey
-                      : AppTheme.primaryColor,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
                 ),
-                child: Text(
-                  isOutOfStock ? "Hết hàng" : "Thêm vào giỏ hàng",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isOutOfStock ? Colors.white54 : AppTheme.goldColor,
-                  ),
-                ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       ),
     );
