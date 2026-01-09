@@ -1015,8 +1015,10 @@ class _CartScreenState extends State<CartScreen> {
           final orderId = orderData['id'] ?? orderData['Id'];
 
           // Call VNPay API
+          if (!mounted) return;
           await _initiateVnPay(context, orderId);
         } else {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Đặt hàng thành công!'),

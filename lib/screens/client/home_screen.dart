@@ -8,6 +8,7 @@ import '../../config/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/coupon_provider.dart';
+import '../../providers/cart_provider.dart';
 import '../auth/login_screen.dart';
 import '../../models/product.dart';
 import '../../models/coupon.dart';
@@ -57,12 +58,19 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         context,
         listen: false,
       );
+      final cartProvider = Provider.of<CartProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
       Future.wait([
         productProvider.fetchCategories(),
         productProvider.fetchProducts(),
         couponProvider.fetchCoupons(),
-      ]);
+      ]).then((_) {
+        // Fetch cart only if authenticated
+        if (authProvider.isAuthenticated) {
+          cartProvider.fetchCart();
+        }
+      });
 
       _isInit = false;
     }
@@ -89,7 +97,19 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                   context,
                   listen: false,
                 );
+                final cartProvider = Provider.of<CartProvider>(
+                  context,
+                  listen: false,
+                );
+                final authProvider = Provider.of<AuthProvider>(
+                  context,
+                  listen: false,
+                );
+
                 await productProvider.fetchProducts();
+                if (authProvider.isAuthenticated) {
+                  await cartProvider.fetchCart();
+                }
               },
               color: AppTheme.goldColor,
               child: CustomScrollView(
@@ -206,25 +226,34 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     ),
                   ),
                   if (isAuthenticated)
-                    Positioned(
-                      right: 4,
-                      top: 4,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 14,
-                          minHeight: 14,
-                        ),
-                        child: const Text(
-                          '2', // Dummy count
-                          style: TextStyle(color: Colors.white, fontSize: 8),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
+                    Consumer<CartProvider>(
+                      builder: (context, cartProvider, child) {
+                        return cartProvider.itemCount > 0
+                            ? Positioned(
+                                right: 4,
+                                top: 4,
+                                child: Container(
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  constraints: const BoxConstraints(
+                                    minWidth: 14,
+                                    minHeight: 14,
+                                  ),
+                                  child: Text(
+                                    '${cartProvider.itemCount}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 8,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink();
+                      },
                     ),
                 ],
               ),
