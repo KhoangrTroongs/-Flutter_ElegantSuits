@@ -15,6 +15,7 @@ class OrderService {
     return data['Data'] ?? data['data'];
   }
 
+  // Lấy danh sách tất cả đơn hàng
   Future<List<Order>> getOrders() async {
     try {
       final response = await ApiService.get(ApiConfig.orders);
@@ -48,6 +49,24 @@ class OrderService {
     }
   }
 
+  // Lấy danh sách đơn hàng của tôi
+  Future<List<Order>> getMyOrders() async {
+    try {
+      final response = await ApiService.get(ApiConfig.myOrders);
+      final data = ApiService.parseResponse(response);
+
+      if (_isSuccess(data) && _getData(data) != null) {
+        return (_getData(data) as List)
+            .map((json) => Order.fromJson(json))
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Error fetching my orders: $e');
+    }
+  }
+
+  // Lấy chi tiết đơn hàng
   Future<Order> getOrderById(int id) async {
     try {
       final response = await ApiService.get(ApiConfig.orderById(id));
@@ -81,6 +100,7 @@ class OrderService {
     }
   }
 
+  // Cập nhật trạng thái đơn hàng
   Future<void> updateOrderStatus(int id, String status) async {
     try {
       final statusInt = _statusToInt(status);

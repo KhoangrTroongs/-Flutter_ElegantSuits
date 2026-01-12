@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../providers/product_provider.dart';
-import '../../models/product.dart';
-import '../../config/app_theme.dart';
+import '../../../providers/product_provider.dart';
+import '../../../models/product.dart';
+import '../../../config/app_theme.dart';
 
 class ProductFormScreen extends StatefulWidget {
   final Product? product;
@@ -28,7 +28,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   // Camera/Image picker
   final ImagePicker _imagePicker = ImagePicker();
-  File? _selectedImage;
+
   List<File> _capturedImages = [];
 
   @override
@@ -74,7 +74,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
       if (photo != null) {
         setState(() {
-          _selectedImage = File(photo.path);
           _capturedImages.add(File(photo.path));
         });
 
@@ -111,7 +110,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
       if (image != null) {
         setState(() {
-          _selectedImage = File(image.path);
           _capturedImages.add(File(image.path));
         });
 
@@ -231,14 +229,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   void _removeImage(int index) {
     setState(() {
       _capturedImages.removeAt(index);
-      if (_capturedImages.isEmpty) {
-        _selectedImage = null;
-      } else {
-        _selectedImage = _capturedImages.last;
-      }
     });
   }
 
+  // Lưu sản phẩm
   Future<void> _save() async {
     if (_formKey.currentState!.validate() && _selectedCategoryId != null) {
       setState(() => _isSaving = true);
@@ -705,6 +699,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     );
   }
 
+  // Tiêu đề section
   Widget _buildSectionTitle(String title) {
     return Text(
       title,

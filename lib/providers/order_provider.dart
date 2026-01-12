@@ -13,6 +13,7 @@ class OrderProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
+  // Lấy danh sách tất cả đơn hàng (Admin)
   Future<void> fetchOrders() async {
     _isLoading = true;
     _error = null;
@@ -29,6 +30,23 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
+  // Lấy danh sách đơn hàng của tôi (Client)
+  Future<void> fetchMyOrders() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _orders = await _orderService.getMyOrders();
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Lấy chi tiết đơn hàng theo ID
   Future<Order?> getOrderById(int id) async {
     try {
       return await _orderService.getOrderById(id);
@@ -39,6 +57,7 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
+  // Cập nhật trạng thái đơn hàng
   Future<bool> updateOrderStatus(int id, String status) async {
     try {
       await _orderService.updateOrderStatus(id, status);
@@ -55,4 +74,3 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 }
-

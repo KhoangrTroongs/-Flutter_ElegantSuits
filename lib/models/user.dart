@@ -60,8 +60,10 @@ class User {
     'roles': roles,
   };
 
+  // Kiểm tra quyền Admin
   bool get isAdmin => roles?.contains('Administrator') ?? false;
 
+  // Lấy tên hiển thị
   String get displayName => fullName ?? email;
 }
 

@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../config/app_theme.dart';
 import '../../config/api_config.dart';
-import '../dashboard/dashboard_screen.dart';
+import '../admin/dashboard/dashboard_screen.dart';
+import '../client/home_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -53,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
+  // Xử lý đăng nhập
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -62,9 +65,13 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
       if (success && mounted) {
+        // Check role and navigate
+        final isAdmin = authProvider.user?.isAdmin ?? false;
+
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const DashboardScreen(),
+            pageBuilder: (_, __, ___) =>
+                isAdmin ? const DashboardScreen() : const ClientHomeScreen(),
             transitionsBuilder: (_, animation, __, child) {
               return FadeTransition(opacity: animation, child: child);
             },
@@ -108,10 +115,10 @@ class _LoginScreenState extends State<LoginScreen>
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Logo Section
+                            // Logo ứng dụng
                             _buildLogoSection(),
                             const SizedBox(height: 40),
-                            // Login Card
+                            // Form đăng nhập
                             _buildLoginCard(),
                           ],
                         ),
@@ -120,6 +127,23 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                 ),
               ),
+              // Nút quay lại trang chủ
+              Positioned(
+                top: 10,
+                left: 10,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white54),
+                  tooltip: 'Trở về trang chủ',
+                  onPressed: () {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (_) => const ClientHomeScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              // Nút cài đặt cấu hình Server (dành cho Dev/Admin)
               Positioned(
                 top: 10,
                 right: 10,
@@ -135,6 +159,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  // Hiển thị dialog cấu hình IP
   void _showConfigDialog() {
     final ipController = TextEditingController(text: ApiConfig.hostIP);
     showDialog(
@@ -184,6 +209,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  // Logo ứng dụng
   Widget _buildLogoSection() {
     return Column(
       children: [
@@ -215,19 +241,11 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
         ),
-        const SizedBox(height: 8),
-        Text(
-          'Admin Panel',
-          style: TextStyle(
-            fontSize: 14,
-            color: AppTheme.textMuted.withValues(alpha: 0.8),
-            letterSpacing: 2,
-          ),
-        ),
       ],
     );
   }
 
+  // Card form đăng nhập
   Widget _buildLoginCard() {
     return Container(
       padding: const EdgeInsets.all(32),
@@ -250,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen>
             ),
             const SizedBox(height: 8),
             Text(
-              'Sign in to continue to dashboard',
+              'Sign in to continue',
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
@@ -345,6 +363,112 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                 ),
               ),
+            ),
+            const SizedBox(height: 24),
+            // Google Login Button
+            Consumer<AuthProvider>(
+              builder: (context, auth, _) => OutlinedButton(
+                onPressed: auth.isLoading
+                    ? null
+                    : () async {
+                        final success = await auth.loginWithGoogle();
+                        if (success && mounted) {
+                          // Check role and navigate (duplicated from _login for now)
+                          final isAdmin = auth.user?.isAdmin ?? false;
+
+                          Navigator.of(context).pushReplacement(
+                            PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => isAdmin
+                                  ? const DashboardScreen()
+                                  : const ClientHomeScreen(),
+                              transitionsBuilder: (_, animation, __, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
+                              transitionDuration: const Duration(
+                                milliseconds: 500,
+                              ),
+                            ),
+                          );
+                        } else if (mounted && auth.error != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.error_outline,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(child: Text(auth.error!)),
+                                ],
+                              ),
+                              backgroundColor: AppTheme.errorColor,
+                            ),
+                          );
+                        }
+                      },
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  side: const BorderSide(color: Colors.grey),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    // Simple G icon since no asset available
+                    Text(
+                      'G',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.red,
+                        fontFamily: 'serif',
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Text(
+                      'Đăng nhập bằng Google',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Register Link
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Don't have an account? ",
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                    );
+                  },
+                  child: const Text(
+                    'Sign Up',
+                    style: TextStyle(
+                      color: AppTheme.goldColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

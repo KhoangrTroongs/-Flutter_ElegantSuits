@@ -14,6 +14,7 @@ class ProductService {
     return data['Data'] ?? data['data'];
   }
 
+  // Lấy danh sách sản phẩm (có thể lọc theo danh mục)
   Future<List<Product>> getProducts({int? categoryId}) async {
     try {
       String url = ApiConfig.products;
@@ -35,6 +36,7 @@ class ProductService {
     }
   }
 
+  // Lấy chi tiết sản phẩm theo ID
   Future<Product> getProductById(int id) async {
     try {
       final response = await ApiService.get(ApiConfig.productById(id));
@@ -49,12 +51,13 @@ class ProductService {
     }
   }
 
+  // Tạo sản phẩm mới
   Future<Product> createProduct(Product product) async {
     try {
       // Backend dùng [FromForm] nên cần gửi multipart
       final fields = {
         'name': product.name,
-        'description': product.description ?? '',
+        'description': product.description,
         'price': product.price.toString(),
         'categoryId': product.categoryId.toString(),
         'isHidden': product.isHidden.toString(),
@@ -72,12 +75,13 @@ class ProductService {
     }
   }
 
+  // Cập nhật sản phẩm
   Future<Product> updateProduct(int id, Product product) async {
     try {
       // Backend dùng [FromForm] nên cần gửi multipart
       final fields = {
         'name': product.name,
-        'description': product.description ?? '',
+        'description': product.description,
         'price': product.price.toString(),
         'categoryId': product.categoryId.toString(),
         'isHidden': product.isHidden.toString(),
@@ -98,6 +102,7 @@ class ProductService {
     }
   }
 
+  // Xóa sản phẩm
   Future<void> deleteProduct(int id) async {
     try {
       final response = await ApiService.delete(ApiConfig.productById(id));
@@ -111,6 +116,7 @@ class ProductService {
     }
   }
 
+  // Lấy danh sách danh mục
   Future<List<Category>> getCategories() async {
     try {
       final response = await ApiService.get(ApiConfig.categories);
@@ -127,7 +133,7 @@ class ProductService {
     }
   }
 
-  // Upload ảnh cho sản phẩm đã có (có ID)
+  // Tải lên ảnh sản phẩm
   Future<String> uploadProductImage(int productId, String filePath) async {
     try {
       final response = await ApiService.uploadFile(
@@ -146,7 +152,7 @@ class ProductService {
     }
   }
 
-  // Upload ảnh tạm cho sản phẩm mới (chưa có ID)
+  // Tải lên ảnh tạm (cho sản phẩm mới)
   Future<String> uploadTempImage(String filePath, String productName) async {
     try {
       final response = await ApiService.uploadFile(

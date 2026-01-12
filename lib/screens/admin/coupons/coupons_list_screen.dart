@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../../providers/coupon_provider.dart';
-import '../../config/app_theme.dart';
+import '../../../providers/coupon_provider.dart';
+import '../../../config/app_theme.dart';
 import 'coupon_form_screen.dart';
 
 // Format giá VNĐ
@@ -97,6 +97,7 @@ class _CouponsListScreenState extends State<CouponsListScreen> {
     );
   }
 
+  // Hiển thị trạng thái rỗng
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -126,6 +127,7 @@ class _CouponsListScreenState extends State<CouponsListScreen> {
     );
   }
 
+  // Hiển thị trạng thái lỗi
   Widget _buildErrorState(String error) {
     return Center(
       child: Column(
@@ -156,6 +158,7 @@ class _CouponsListScreenState extends State<CouponsListScreen> {
     );
   }
 
+  // Xác nhận xóa coupon
   Future<void> _confirmDelete(
     BuildContext context,
     CouponProvider provider,

@@ -4,7 +4,7 @@ import '../services/auth_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
-  
+
   User? _user;
   bool _isLoading = false;
   String? _error;
@@ -14,6 +14,7 @@ class AuthProvider extends ChangeNotifier {
   String? get error => _error;
   bool get isAuthenticated => _user != null;
 
+  // Đăng nhập bằng Email/Password
   Future<bool> login(String email, String password) async {
     _isLoading = true;
     _error = null;
@@ -33,14 +34,57 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // Đăng nhập bằng Google
+  Future<bool> loginWithGoogle() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final response = await _authService.loginWithGoogle();
+      _user = response.user;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      // Don't set error if cancelled
+      if (!e.toString().contains('Cancelled')) {
+        _error = e.toString();
+      }
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // Đăng ký tài khoản mới
+  Future<bool> register(Map<String, dynamic> data) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final success = await _authService.register(data);
+      _isLoading = false;
+      notifyListeners();
+      return success;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // Đăng xuất
   Future<void> logout() async {
     await _authService.logout();
     _user = null;
     notifyListeners();
   }
 
+  // Kiểm tra trạng thái đăng nhập
   Future<bool> checkAuth() async {
     return await _authService.isLoggedIn();
   }
 }
-

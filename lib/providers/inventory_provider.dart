@@ -33,7 +33,7 @@ class InventoryProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Tìm sản phẩm theo mã linear (quét barcode)
+  // Tìm sản phẩm theo mã vạch
   Future<InventoryItem?> findByLinearCode(String linearCode) async {
     _isLoading = true;
     _error = null;
@@ -120,7 +120,7 @@ class InventoryProvider with ChangeNotifier {
     }
   }
 
-  /// Tạo mã linear cho tất cả sản phẩm
+  // Tạo mã vạch cho tất cả sản phẩm
   Future<int> generateLinearCodes() async {
     try {
       final count = await _inventoryService.generateLinearCodes();
@@ -140,4 +140,3 @@ class InventoryProvider with ChangeNotifier {
     }
   }
 }
-

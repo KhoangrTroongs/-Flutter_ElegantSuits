@@ -56,13 +56,16 @@ class Coupon {
     'isActive': isActive,
   };
 
+  // Kiểm tra hết hạn
   bool get isExpired {
     if (expiryDate == null) return false;
     return DateTime.now().isAfter(expiryDate!);
   }
 
+  // Kiểm tra hết số lượng
   bool get isDepleted => quantity == 0;
 
+  // Kiểm tra tính hợp lệ
   bool get isValid {
     if (!isActive) return false;
     if (isExpired) return false;
@@ -70,6 +73,7 @@ class Coupon {
     return true;
   }
 
+  // Trạng thái hiển thị
   String get status {
     if (!isActive) return 'Không kích hoạt';
     if (isExpired) return 'Đã hết hạn';

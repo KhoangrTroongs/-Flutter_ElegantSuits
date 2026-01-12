@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 class AppTheme {
   // ============ ELEGANT BLACK & GOLD THEME ============
   // Primary Colors - Matching Website
-  static const Color primaryColor = Color(0xFF1A1A1A); // Elegant Black
-  static const Color primaryDark = Color(0xFF222222); // Dark variant
-  static const Color primaryLight = Color(0xFF333333); // Light variant
+  // Màu chính (Đen & Vàng kim)
+  static const Color primaryColor = Color(0xFF1A1A1A); // Đen thanh lịch
+  static const Color primaryDark = Color(0xFF222222);
+  static const Color primaryLight = Color(0xFF333333);
 
   // Gold Accent Colors
-  static const Color goldColor = Color(0xFFD4AF37); // Elegant Gold
-  static const Color goldLight = Color(0xFFE5C76B); // Light Gold
-  static const Color goldDark = Color(0xFFB38728); // Dark Gold
+  // Màu vàng kim (Điểm nhấn)
+  static const Color goldColor = Color(0xFFD4AF37);
+  static const Color goldLight = Color(0xFFE5C76B);
+  static const Color goldDark = Color(0xFFB38728);
 
   // Status Colors
   static const Color successColor = Color(0xFF27AE60); // Green
@@ -19,11 +21,13 @@ class AppTheme {
   static const Color infoColor = Color(0xFF3498DB); // Blue
 
   // Background Colors
+  // Màu nền
   static const Color backgroundColor = Color(0xFFF8F8F8);
   static const Color surfaceColor = Color(0xFFFFFFFF);
   static const Color cardColor = Color(0xFFFFFFFF);
 
   // Text Colors
+  // Màu chữ
   static const Color textPrimary = Color(0xFF1A1A1A);
   static const Color textSecondary = Color(0xFF666666);
   static const Color textMuted = Color(0xFFAAAAAA);
@@ -228,6 +232,7 @@ class AppTheme {
   }
 
   // Dark Theme for premium feel
+  // Giao diện tối (Dark Theme)
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,

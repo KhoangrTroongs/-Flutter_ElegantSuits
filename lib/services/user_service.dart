@@ -15,6 +15,7 @@ class UserService {
     return data['Data'] ?? data['data'];
   }
 
+  // Lấy danh sách người dùng
   Future<List<User>> getUsers() async {
     try {
       final response = await ApiService.get(ApiConfig.users);
@@ -48,6 +49,7 @@ class UserService {
     }
   }
 
+  // Lấy thông tin người dùng theo ID
   Future<User> getUserById(String id) async {
     try {
       final response = await ApiService.get(ApiConfig.userById(id));
@@ -62,6 +64,7 @@ class UserService {
     }
   }
 
+  // Xóa người dùng
   Future<void> deleteUser(String id) async {
     try {
       final response = await ApiService.delete(ApiConfig.userById(id));

@@ -6,11 +6,7 @@ class CartItem {
   int quantity;
   final String? size;
 
-  CartItem({
-    required this.product,
-    this.quantity = 1,
-    this.size,
-  });
+  CartItem({required this.product, this.quantity = 1, this.size});
 
   /// Tính thành tiền của item
   double get subtotal => product.price * quantity;
@@ -49,7 +45,7 @@ class CartItem {
   }
 }
 
-/// Giỏ hàng POS
+// Giỏ hàng POS
 class Cart {
   final List<CartItem> items;
   String? couponCode;
@@ -75,12 +71,13 @@ class Cart {
   /// Giỏ hàng có rỗng không
   bool get isEmpty => items.isEmpty;
 
-  /// Thêm sản phẩm vào giỏ
+  // Thêm sản phẩm vào giỏ
   void addProduct(Product product, {int quantity = 1, String? size}) {
     // Kiểm tra sản phẩm đã có trong giỏ chưa
-    final existingIndex = items.indexWhere((item) => 
-      item.product.id == product.id && item.size == size);
-    
+    final existingIndex = items.indexWhere(
+      (item) => item.product.id == product.id && item.size == size,
+    );
+
     if (existingIndex != -1) {
       // Đã có, tăng số lượng
       final existingItem = items[existingIndex];
@@ -90,25 +87,23 @@ class Cart {
       }
     } else {
       // Chưa có, thêm mới
-      items.add(CartItem(
-        product: product,
-        quantity: quantity,
-        size: size,
-      ));
+      items.add(CartItem(product: product, quantity: quantity, size: size));
     }
   }
 
-  /// Xóa sản phẩm khỏi giỏ
+  // Xóa sản phẩm khỏi giỏ
   void removeProduct(int productId, {String? size}) {
-    items.removeWhere((item) => 
-      item.product.id == productId && item.size == size);
+    items.removeWhere(
+      (item) => item.product.id == productId && item.size == size,
+    );
   }
 
-  /// Cập nhật số lượng sản phẩm
+  // Cập nhật số lượng sản phẩm
   void updateQuantity(int productId, int quantity, {String? size}) {
-    final index = items.indexWhere((item) => 
-      item.product.id == productId && item.size == size);
-    
+    final index = items.indexWhere(
+      (item) => item.product.id == productId && item.size == size,
+    );
+
     if (index != -1) {
       if (quantity <= 0) {
         items.removeAt(index);
@@ -118,21 +113,21 @@ class Cart {
     }
   }
 
-  /// Áp dụng coupon
+  // Áp dụng coupon
   void applyCoupon(String code, int percentage) {
     couponCode = code;
     discountPercentage = percentage;
     discountAmount = subtotal * percentage / 100;
   }
 
-  /// Hủy coupon
+  // Hủy coupon
   void removeCoupon() {
     couponCode = null;
     discountPercentage = 0;
     discountAmount = 0;
   }
 
-  /// Xóa toàn bộ giỏ hàng
+  // Xóa toàn bộ giỏ hàng
   void clear() {
     items.clear();
     removeCoupon();
@@ -143,4 +138,3 @@ class Cart {
     return items.map((item) => item.toOrderJson()).toList();
   }
 }
-

@@ -19,6 +19,7 @@ class InventoryItem {
     required this.price,
   });
 
+  // Lấy URL ảnh đầy đủ
   String? get fullImageUrl {
     if (imageUrl == null || imageUrl!.isEmpty) return null;
     if (imageUrl!.startsWith('http://') || imageUrl!.startsWith('https://')) {
@@ -71,4 +72,3 @@ class InventoryItem {
     );
   }
 }
-

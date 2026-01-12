@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../../providers/coupon_provider.dart';
-import '../../models/coupon.dart';
-import '../../config/app_theme.dart';
+import '../../../providers/coupon_provider.dart';
+import '../../../models/coupon.dart';
+import '../../../config/app_theme.dart';
 
 class CouponFormScreen extends StatefulWidget {
   final Coupon? coupon;
@@ -55,6 +55,7 @@ class _CouponFormScreenState extends State<CouponFormScreen> {
     super.dispose();
   }
 
+  // Chọn ngày hết hạn
   Future<void> _selectExpiryDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -80,6 +81,7 @@ class _CouponFormScreenState extends State<CouponFormScreen> {
     }
   }
 
+  // Lưu mã giảm giá
   Future<void> _save() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isSaving = true);
@@ -413,6 +415,7 @@ class _CouponFormScreenState extends State<CouponFormScreen> {
     );
   }
 
+  // Tiêu đề section
   Widget _buildSectionTitle(String title) {
     return Text(
       title,

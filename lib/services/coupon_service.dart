@@ -6,6 +6,7 @@ import 'api_service.dart';
 class CouponService {
   // CouponApi trả về trực tiếp array, không wrap trong ResponseDTO
 
+  // Lấy danh sách mã giảm giá
   Future<List<Coupon>> getCoupons() async {
     try {
       final response = await ApiService.get(ApiConfig.coupons);
@@ -32,6 +33,7 @@ class CouponService {
     }
   }
 
+  // Thêm mới mã giảm giá
   Future<Coupon> createCoupon(Coupon coupon) async {
     try {
       final response = await ApiService.post(
@@ -49,6 +51,7 @@ class CouponService {
     }
   }
 
+  // Cập nhật mã giảm giá
   Future<Coupon> updateCoupon(int id, Coupon coupon) async {
     try {
       final response = await ApiService.put(
@@ -66,6 +69,7 @@ class CouponService {
     }
   }
 
+  // Xóa mã giảm giá
   Future<void> deleteCoupon(int id) async {
     try {
       final response = await ApiService.delete(ApiConfig.couponById(id));

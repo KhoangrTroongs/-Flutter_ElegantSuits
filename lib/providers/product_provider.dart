@@ -15,6 +15,7 @@ class ProductProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
+  // Lấy danh sách sản phẩm (có thể lọc theo danh mục)
   Future<void> fetchProducts({int? categoryId}) async {
     _isLoading = true;
     _error = null;
@@ -31,6 +32,7 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
+  // Lấy danh sách danh mục
   Future<void> fetchCategories() async {
     try {
       _categories = await _productService.getCategories();
@@ -41,6 +43,7 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
+  // Thêm sản phẩm mới
   Future<bool> addProduct(Product product) async {
     try {
       final newProduct = await _productService.createProduct(product);
@@ -54,6 +57,7 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
+  // Cập nhật sản phẩm
   Future<bool> updateProduct(int id, Product product) async {
     try {
       final updatedProduct = await _productService.updateProduct(id, product);
@@ -70,6 +74,7 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
+  // Xóa sản phẩm
   Future<bool> deleteProduct(int id) async {
     try {
       await _productService.deleteProduct(id);
@@ -83,7 +88,7 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
-  // Upload ảnh cho sản phẩm đã có
+  // Tải lên ảnh sản phẩm
   Future<String?> uploadProductImage(int productId, String filePath) async {
     try {
       final imageUrl = await _productService.uploadProductImage(
@@ -104,7 +109,7 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
-  // Upload ảnh tạm cho sản phẩm mới
+  // Tải lên ảnh tạm (cho sản phẩm đang tạo)
   Future<String?> uploadTempImage(String filePath, String productName) async {
     try {
       final imageUrl = await _productService.uploadTempImage(

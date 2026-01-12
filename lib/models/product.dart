@@ -1,6 +1,5 @@
+import '../config/api_config.dart';
 class Product {
-  // Base URL cho ảnh - backend server
-  static const String _imageBaseUrl = 'https://localhost:5001';
 
   final int id;
   final String name;
@@ -37,8 +36,12 @@ class Product {
     if (imageUrl!.startsWith('http://') || imageUrl!.startsWith('https://')) {
       return imageUrl;
     }
-    // Nếu là relative path, thêm base URL
-    return '$_imageBaseUrl$imageUrl';
+// Nếu là relative path, thêm base URL từ ApiConfig
+    // Loại bỏ dấu / ở đầu imageUrl nếu có để tránh double slash //
+    final cleanPath = imageUrl!.startsWith('/')
+        ? imageUrl!.substring(1)
+        : imageUrl!;
+    return '${ApiConfig.imageBaseUrl}/$cleanPath';
   }
 
   factory Product.fromJson(Map<String, dynamic> json) {

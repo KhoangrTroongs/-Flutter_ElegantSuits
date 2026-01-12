@@ -8,6 +8,10 @@ class Order {
   final String? shippingAddress;
   final String? notes;
   final List<OrderItem>? items;
+  final String? couponCode;
+  final double discountAmount;
+  final String? paymentMethod;
+  final String? paymentStatus;
 
   Order({
     required this.id,
@@ -19,6 +23,10 @@ class Order {
     this.shippingAddress,
     this.notes,
     this.items,
+    this.couponCode,
+    this.discountAmount = 0,
+    this.paymentMethod,
+    this.paymentStatus,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
@@ -36,12 +44,32 @@ class Order {
       orderDate: DateTime.parse(json['OrderDate'] ?? json['orderDate']),
       shippingAddress: json['ShippingAddress'] ?? json['shippingAddress'],
       notes: json['Notes'] ?? json['notes'],
+      couponCode: json['CouponCode'] ?? json['couponCode'],
+      discountAmount: (json['DiscountAmount'] ?? json['discountAmount'] ?? 0)
+          .toDouble(),
+      paymentMethod: json['PaymentMethod'] ?? json['paymentMethod'],
+      paymentStatus: _parsePaymentStatus(
+        json['PaymentStatus'] ?? json['paymentStatus'],
+      ),
       items: itemsList != null
           ? (itemsList as List).map((i) => OrderItem.fromJson(i)).toList()
           : null,
     );
   }
 
+  // Phân tích trạng thái thanh toán
+  static String _parsePaymentStatus(dynamic status) {
+    if (status is int) {
+      // 0=Pending, 1=Paid, 2=Failed
+      const statusNames = ['Pending', 'Paid', 'Failed'];
+      return status >= 0 && status < statusNames.length
+          ? statusNames[status]
+          : 'Unknown';
+    }
+    return status?.toString() ?? 'Pending';
+  }
+
+  // Phân tích trạng thái đơn hàng
   static String _parseStatus(dynamic status) {
     if (status is int) {
       // Enum values: 0=Pending, 1=Confirmed, 2=Shipping, 3=Delivered, 4=Cancelled, 5=Returned

@@ -4,7 +4,7 @@ import '../config/api_config.dart';
 import 'api_service.dart';
 
 class StatisticsService {
-  /// Lấy thống kê tổng quan
+  // Lấy thống kê tổng quan
   Future<StatisticsOverview> getOverviewStatistics({
     DateTime? startDate,
     DateTime? endDate,
@@ -33,21 +33,21 @@ class StatisticsService {
     }
   }
 
-  /// Lấy thống kê hôm nay
+  // Lấy thống kê hôm nay
   Future<StatisticsOverview> getTodayStatistics() async {
     final today = DateTime.now();
     final startOfDay = DateTime(today.year, today.month, today.day);
     return getOverviewStatistics(startDate: startOfDay, endDate: today);
   }
 
-  /// Lấy thống kê tháng này
+  // Lấy thống kê tháng này
   Future<StatisticsOverview> getMonthStatistics() async {
     final now = DateTime.now();
     final startOfMonth = DateTime(now.year, now.month, 1);
     return getOverviewStatistics(startDate: startOfMonth, endDate: now);
   }
 
-  /// Lấy thống kê tổng (không giới hạn thời gian)
+  // Lấy thống kê toàn thời gian
   Future<StatisticsOverview> getAllTimeStatistics() async {
     // Không truyền startDate và endDate để lấy tất cả
     return getOverviewStatistics();

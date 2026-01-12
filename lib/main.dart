@@ -9,17 +9,18 @@ import 'providers/order_provider.dart';
 import 'providers/user_provider.dart';
 import 'providers/coupon_provider.dart';
 import 'providers/inventory_provider.dart';
-import 'providers/pos_provider.dart';
+import 'providers/cart_provider.dart'; // Import CartProvider
 import 'services/inventory_service.dart';
 import 'services/signalr_service.dart';
+import 'providers/pos_provider.dart';
 import 'screens/auth/login_screen.dart';
-import 'screens/dashboard/dashboard_screen.dart';
-import 'screens/inventory/inventory_screen.dart';
-import 'screens/pos/pos_screen.dart';
+import 'screens/client/home_screen.dart';
+import 'screens/admin/dashboard/dashboard_screen.dart';
+import 'screens/admin/inventory/inventory_screen.dart';
+import 'screens/admin/pos/pos_screen.dart';
 import 'config/api_config.dart';
 
-/// HttpOverrides để bypass SSL certificate check trong development
-/// CHỈ SỬ DỤNG CHO DEVELOPMENT - KHÔNG DÙNG CHO PRODUCTION!
+/// Override HTTP để bỏ qua lỗi SSL (Dev only)
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
@@ -32,11 +33,10 @@ class MyHttpOverrides extends HttpOverrides {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load Global Config (IP Address, etc.)
+  // Khởi tạo cấu hình API toàn cục
   await ApiConfig.init();
 
-  // Bypass SSL certificate check cho development (Android Emulator, etc.)
-  // Chỉ áp dụng cho non-web platforms
+  // Bỏ qua lỗi SSL trên Mobile (Dev only)
   if (!kIsWeb) {
     HttpOverrides.global = MyHttpOverrides();
   }
@@ -61,6 +61,7 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(create: (_) => PosProvider()),
         ChangeNotifierProvider(create: (_) => SignalRService()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: MaterialApp(
         title: 'Elegant Suits Admin',
@@ -71,6 +72,7 @@ class MyApp extends StatelessWidget {
           '/login': (context) => const LoginScreen(),
           '/dashboard': (context) => const DashboardScreen(),
           '/inventory': (context) => const InventoryScreen(),
+          '/client_home': (context) => const ClientHomeScreen(),
           '/pos': (context) => const PosScreen(),
         },
       ),
@@ -124,13 +126,14 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(milliseconds: 2000));
     if (mounted) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final isLoggedIn = await authProvider.checkAuth();
+      await authProvider.checkAuth();
 
       if (mounted) {
+        // Chuyển hướng đến màn hình chính
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                isLoggedIn ? const DashboardScreen() : const LoginScreen(),
+                const ClientHomeScreen(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
                   return FadeTransition(opacity: animation, child: child);
@@ -159,7 +162,7 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo
+                // Logo ứng dụng
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
@@ -174,7 +177,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
                 const SizedBox(height: 32),
-                // Brand Name
+                // Tên thương hiệu
                 ShaderMask(
                   shaderCallback: (bounds) =>
                       AppTheme.goldGradient.createShader(bounds),
@@ -198,7 +201,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
                 const SizedBox(height: 48),
-                // Loading Indicator
+                // Biểu tượng tải trang
                 SizedBox(
                   width: 32,
                   height: 32,
