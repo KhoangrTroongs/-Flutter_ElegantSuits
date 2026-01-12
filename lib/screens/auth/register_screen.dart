@@ -36,6 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  // Chọn ngày sinh từ lịch (DatePicker)
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -62,6 +63,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  // Xử lý đăng ký tài khoản
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedDate == null) {
@@ -133,7 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text(
-                    'Register',
+                    'Đăng ký tài khoản',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -334,6 +336,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  // Style chung cho các ô nhập liệu
   InputDecoration _inputDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,

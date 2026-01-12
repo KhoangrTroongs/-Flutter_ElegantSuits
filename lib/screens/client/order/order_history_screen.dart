@@ -15,6 +15,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   @override
   void initState() {
     super.initState();
+    // Tải danh sách đơn hàng khi màn hình được tạo
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<OrderProvider>(context, listen: false).fetchMyOrders();
     });
@@ -64,6 +65,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     );
   }
 
+  // Card hiển thị thông tin tóm tắt của đơn hàng
   Widget _buildOrderCard(
     BuildContext context,
     Order order,
@@ -201,6 +203,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     );
   }
 
+  // Hiển thị chi tiết đơn hàng trong BottomSheet
   void _showOrderDetails(
     BuildContext context,
     Order order,

@@ -15,10 +15,10 @@ class CartProvider with ChangeNotifier {
   int get itemCount =>
       _cart?.items.fold<int>(0, (sum, item) => sum + item.quantity) ?? 0;
 
-  // Tổng tiền (nếu API tính sai hoặc cần tính local)
+  // Tổng giá trị đơn hàng
   double get totalPrice => _cart?.totalPrice ?? 0;
 
-  // Fetch Cart
+  // Lấy danh sách giỏ hàng
   Future<void> fetchCart() async {
     _isLoading = true;
     _error = null;
@@ -32,10 +32,9 @@ class CartProvider with ChangeNotifier {
           (data['isSuccess'] == true || data['IsSuccess'] == true)) {
         _cart = ApiCart.fromJson(data['data'] ?? data['Data']);
       } else {
-        // Nếu chưa có giỏ hàng hoặc lỗi
+        // Giỏ hàng trống hoặc lỗi
         _cart = null;
-        // Không coi là lỗi nếu chỉ là rỗng? Controller trả về 200 OK với empty items nếu rỗng.
-        // Nên nếu fail thật thì mới log.
+        // Xử lý thông báo lỗi từ Map
         if (data is Map) {
           _error = data['message'] ?? data['Message'];
         }
@@ -49,7 +48,7 @@ class CartProvider with ChangeNotifier {
     }
   }
 
-  // Add to Cart
+  // Thêm sản phẩm vào giỏ
   Future<void> addToCart(int productId, int quantity, String? size) async {
     _isLoading = true;
     notifyListeners();
@@ -75,7 +74,7 @@ class CartProvider with ChangeNotifier {
     }
   }
 
-  // Update Cart Item
+  // Cập nhật số lượng sản phẩm
   Future<void> updateCartItem(int cartItemId, int quantity) async {
     try {
       final body = {'cartItemId': cartItemId, 'quantity': quantity};
@@ -97,7 +96,7 @@ class CartProvider with ChangeNotifier {
     }
   }
 
-  // Remove Cart Item
+  // Xóa sản phẩm khỏi giỏ
   Future<void> removeCartItem(int cartItemId) async {
     try {
       final response = await ApiService.delete(
@@ -107,8 +106,7 @@ class CartProvider with ChangeNotifier {
 
       if (data is Map &&
           (data['isSuccess'] == true || data['IsSuccess'] == true)) {
-        // Backend returns boolean success, so we must re-fetch cart because
-        // we don't know the new total price or state on server.
+        // Tải lại giỏ hàng sau khi xóa
         await fetchCart();
       } else {
         throw Exception(data['message'] ?? 'Failed to remove item');
@@ -120,7 +118,7 @@ class CartProvider with ChangeNotifier {
     }
   }
 
-  // Clear Cart
+  // Xóa toàn bộ giỏ hàng
   Future<void> clearCart() async {
     try {
       final response = await ApiService.delete(ApiConfig.cart);
@@ -138,7 +136,7 @@ class CartProvider with ChangeNotifier {
     }
   }
 
-  // Checkout
+  // Thanh toán
   Future<Map<String, dynamic>> checkout({
     required String shippingAddress,
     String? notes,
@@ -161,11 +159,7 @@ class CartProvider with ChangeNotifier {
 
       if (data is Map &&
           (data['isSuccess'] == true || data['IsSuccess'] == true)) {
-        // Order created successfully
-        // Backend clears cart on success?
-        // If not, clear local cart or refetch.
-        // Based on OrderService, backend calls _cartService.ClearCartAsync(userId).
-        // So we just need to refresh local cart (it should be empty).
+        // Thanh toán thành công, làm mới giỏ hàng
         await fetchCart();
         return {'success': true, 'data': data['data'] ?? data['Data']};
       } else {

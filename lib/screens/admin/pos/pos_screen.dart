@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
+
 import '../../../providers/pos_provider.dart';
 import '../../../models/cart.dart' show CartItem;
 import '../../../config/app_theme.dart';
-import '../../../config/api_config.dart';
+
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import '../inventory/scan_barcode_screen.dart';
@@ -44,6 +44,7 @@ class _PosScreenState extends State<PosScreen> {
     _initDeepLinkListener();
   }
 
+  // Khởi tạo và lắng nghe Deep Link
   void _initDeepLinkListener() {
     final _appLinks = AppLinks();
     _appLinks.uriLinkStream.listen((uri) {
@@ -67,6 +68,7 @@ class _PosScreenState extends State<PosScreen> {
     });
   }
 
+  // Kiểm tra thanh toán và hiển thị dialog thành công
   Future<void> _checkPaymentAndShowDialog(int orderId) async {
     try {
       final provider = Provider.of<PosProvider>(context, listen: false);
@@ -94,6 +96,7 @@ class _PosScreenState extends State<PosScreen> {
     }
   }
 
+  // Xử lý khi thanh toán thất bại
   void _handlePaymentFailure(String status) {
     if (!mounted) return;
 
@@ -157,7 +160,8 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  /// Phần chọn khách hàng
+  // Phần chọn khách hàng
+  // Cho phép tìm kiếm hoặc chọn khách vãng lai
   Widget _buildCustomerSection(PosProvider provider) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -211,6 +215,7 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
+  // Ô tìm kiếm khách hàng
   Widget _buildCustomerSearchField(PosProvider provider) {
     return Column(
       children: [
@@ -295,7 +300,8 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  /// Phần giỏ hàng
+  // Phần hiển thị giỏ hàng
+  // Bao gồm danh sách sản phẩm và nút thêm sản phẩm
   Widget _buildCartSection(PosProvider provider) {
     if (provider.cart.isEmpty) {
       return Center(
@@ -356,7 +362,7 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  /// Nút thêm sản phẩm (ở cuối danh sách giỏ hàng)
+  // Nút thêm sản phẩm
   Widget _buildAddProductButton() {
     return Card(
       color: AppTheme.cardColor.withValues(alpha: 0.5),
@@ -403,6 +409,7 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
+  // Card hiển thị sản phẩm trong giỏ
   Widget _buildCartItem(CartItem cartItem, PosProvider provider) {
     final product = cartItem.product;
     return Card(
@@ -545,7 +552,8 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  /// Phần tổng tiền và thanh toán
+  // Phần tống tiền và thanh toán
+  // Tính toán tổng tiền, áp dụng coupon và các phương thức thanh toán
   Widget _buildTotalSection(PosProvider provider) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -682,6 +690,7 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
+  // Widget hiển thị Coupon
   Widget _buildCouponSection(PosProvider provider) {
     if (provider.cart.couponCode != null) {
       return Container(
@@ -779,7 +788,7 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  /// Hiển thị dialog chọn coupon
+  // Hiển thị dialog chọn coupon
   void _showCouponSelectionDialog(PosProvider provider) {
     showModalBottomSheet(
       context: context,
@@ -1104,7 +1113,7 @@ class _PosScreenState extends State<PosScreen> {
         // Thanh toán VNPay
         final payUrl = await provider.createVnPayPayment(orderId);
         if (payUrl != null && mounted) {
-           final result = await Navigator.push(
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => PaymentWebViewScreen(
@@ -1116,14 +1125,14 @@ class _PosScreenState extends State<PosScreen> {
 
           if (!mounted) return;
 
-           if (result != null && result is Map) {
+          if (result != null && result is Map) {
             final status = result['status'];
             if (status == 'success') {
-               _showSuccessDialog(orderId, 'VNPay');
-               provider.reset();
-               provider.selectGuestCustomer();
+              _showSuccessDialog(orderId, 'VNPay');
+              provider.reset();
+              provider.selectGuestCustomer();
             } else {
-               ScaffoldMessenger.of(context).showSnackBar(
+              ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Thanh toán thất bại: $status'),
                   backgroundColor: Colors.red,
@@ -1155,6 +1164,4 @@ class _PosScreenState extends State<PosScreen> {
       ),
     );
   }
-
-
 }

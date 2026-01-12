@@ -6,7 +6,7 @@ import 'api_service.dart';
 class InventoryService {
   InventoryService([ApiService? apiService]);
 
-  /// Lấy danh sách tồn kho
+  // Lấy danh sách tồn kho
   Future<List<InventoryItem>> getInventory() async {
     try {
       print('Calling inventory API: ${ApiConfig.inventory}');
@@ -36,7 +36,7 @@ class InventoryService {
     }
   }
 
-  /// Tìm sản phẩm theo mã linear (barcode)
+  // Tìm sản phẩm theo mã vạch
   Future<InventoryItem?> getByLinearCode(String linearCode) async {
     try {
       final response = await ApiService.get(
@@ -56,9 +56,7 @@ class InventoryService {
     }
   }
 
-  /// Cập nhật số lượng tồn kho
-  /// [isAbsolute] = true: đặt số lượng tuyệt đối
-  /// [isAbsolute] = false: thêm/bớt số lượng (quantity có thể âm để xuất kho)
+  // Cập nhật số lượng tồn kho (isAbsolute = true: đặt cố định, false: thêm bớt)
   Future<InventoryItem?> updateQuantity(
     int productId,
     int quantity, {
@@ -79,22 +77,22 @@ class InventoryService {
     return null;
   }
 
-  /// Nhập kho - thêm số lượng
+  // Nhập kho
   Future<InventoryItem?> importStock(int productId, int quantity) async {
     return updateQuantity(productId, quantity, isAbsolute: false);
   }
 
-  /// Xuất kho - bớt số lượng
+  // Xuất kho
   Future<InventoryItem?> exportStock(int productId, int quantity) async {
     return updateQuantity(productId, -quantity, isAbsolute: false);
   }
 
-  /// Đặt số lượng tuyệt đối
+  // Đặt số lượng cố định
   Future<InventoryItem?> setQuantity(int productId, int quantity) async {
     return updateQuantity(productId, quantity, isAbsolute: true);
   }
 
-  /// Tạo mã linear cho tất cả sản phẩm chưa có
+  // Tạo mã vạch cho sản phẩm
   Future<int> generateLinearCodes() async {
     final response = await ApiService.post(
       ApiConfig.inventoryGenerateLinearCodes,

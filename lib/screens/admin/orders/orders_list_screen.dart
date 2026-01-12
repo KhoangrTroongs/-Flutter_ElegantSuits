@@ -27,6 +27,7 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
     );
   }
 
+  // Lấy màu sắc theo trạng thái
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -42,6 +43,7 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
     }
   }
 
+  // Lấy icon theo trạng thái
   IconData _getStatusIcon(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -61,9 +63,10 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      appBar: AppBar(title: const Text('Orders')),
+      appBar: AppBar(title: const Text('Quản lý đơn hàng')),
       body: Consumer<OrderProvider>(
         builder: (context, provider, _) {
+          // Trạng thái đang tải
           if (provider.isLoading) {
             return Center(
               child: CircularProgressIndicator(
@@ -72,14 +75,17 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
             );
           }
 
+          // Trạng thái lỗi
           if (provider.error != null) {
             return _buildErrorState(provider.error!);
           }
 
+          // Trạng thái danh sách trống
           if (provider.orders.isEmpty) {
             return _buildEmptyState();
           }
 
+          // Hiển thị danh sách đơn hàng
           return RefreshIndicator(
             color: AppTheme.goldColor,
             onRefresh: () => provider.fetchOrders(),
@@ -107,6 +113,7 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
     );
   }
 
+  // Hiển thị trạng thái rỗng
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -136,6 +143,7 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
     );
   }
 
+  // Hiển thị trạng thái lỗi
   Widget _buildErrorState(String error) {
     return Center(
       child: Column(

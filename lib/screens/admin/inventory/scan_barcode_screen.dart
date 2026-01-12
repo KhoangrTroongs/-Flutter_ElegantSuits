@@ -43,6 +43,7 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen> {
     super.dispose();
   }
 
+  // Xử lý sự kiện khi quét được mã vạch
   void _onBarcodeDetected(BarcodeCapture capture) {
     if (!_isScanning) return;
 
@@ -54,6 +55,7 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen> {
     }
   }
 
+  // Chuyển đổi chế độ Camera / Nhập tay
   void _toggleCameraMode() {
     setState(() {
       _isCameraMode = !_isCameraMode;
@@ -63,6 +65,7 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen> {
     });
   }
 
+  // Tìm kiếm sản phẩm theo mã vạch
   Future<void> _searchByBarcode() async {
     final barcode = _barcodeController.text.trim();
     if (barcode.isEmpty) {
@@ -88,6 +91,7 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen> {
     });
   }
 
+  // Xử lý hành động (Nhập kho hoặc trả về POS)
   Future<void> _onAction() async {
     if (_foundItem == null) return;
 
@@ -139,6 +143,8 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen> {
     }
   }
 
+  // Hiển thị giao diện Camera Scanner
+  // Sử dụng MobileScanner để quét mã
   Widget _buildCameraScanner() {
     return Container(
       height: 280,
@@ -404,6 +410,8 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen> {
     );
   }
 
+  // Card hiển thị thông tin sản phẩm tìm thấy
+  // Cho phép nhập kho hoặc thêm vào giỏ hàng POS
   Widget _buildFoundItemCard() {
     final item = _foundItem!;
 
@@ -590,7 +598,7 @@ class _ScanBarcodeScreenState extends State<ScanBarcodeScreen> {
   }
 }
 
-// Custom painter for scan overlay
+// Custom painter vẽ khung quét mã barcode
 class ScanOverlayPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

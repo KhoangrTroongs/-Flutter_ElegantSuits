@@ -47,6 +47,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 
+  // Lấy chi tiết sản phẩm từ API
   Future<void> _fetchProductDetails() async {
     try {
       final response = await ApiService.get(
@@ -73,6 +74,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 
+  // Phân tích mô tả sản phẩm để lấy thông tin Size và Đánh giá
   void _parseDescription() {
     final product = _product ?? widget.product;
     String description = product.description; // Use local product
@@ -170,6 +172,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     print('DEBUG: Parsed ${_reviews.length} reviews');
   }
 
+  // Gửi đánh giá sản phẩm
   Future<void> _submitReview(int rating, String comment) async {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -259,6 +262,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 
+  // Hiển thị dialog nhập đánh giá
   void _showReviewDialog() async {
     final token = await ApiService.getToken();
     if (token == null) {
@@ -472,6 +476,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
+  // Header hiển thị tên giá và trạng thái kho
   Widget _buildHeader() {
     final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
     final isAvailable = product.quantity > 0;
@@ -537,6 +542,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
+  // Widget chọn Size
   Widget _buildSizeSelector() {
     if (_availableSizes.isEmpty) {
       return Container(
@@ -691,6 +697,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
+  // Widget hiển thị mô tả
   Widget _buildDescription() {
     if (_cleanDescription.isEmpty) return const SizedBox.shrink();
 
@@ -710,6 +717,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
+  // Widget hiển thị danh sách đánh giá
   Widget _buildReviews() {
     if (_reviews.isEmpty) {
       return Column(

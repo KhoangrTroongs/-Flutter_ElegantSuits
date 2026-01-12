@@ -38,6 +38,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   @override
   void initState() {
     super.initState();
+    // Lắng nghe sự kiện cuộn để thay đổi trạng thái sticky header
     _scrollController.addListener(() {
       if (_scrollController.offset > 50 && !_isScrolled) {
         setState(() => _isScrolled = true);
@@ -47,6 +48,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     });
   }
 
+  // Tải dữ liệu ban đầu
   @override
   void didChangeDependencies() {
     if (_isInit) {
@@ -165,6 +167,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
 
   // --- WIDGETS ---
 
+  // Thanh điều hướng cố định (Sticky AppBar)
   Widget _buildStickyAppBar(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -305,6 +308,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     );
   }
 
+  // Banner quảng cáo (Carousel)
   Widget _buildBanner() {
     final banners = [
       'assets/images/banner_1.jpg',
@@ -350,6 +354,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
 
   // Removed _buildServiceIcons and replaced with Coupon Section in build method.
 
+  // Khu vực hiển thị mã giảm giá (Voucher)
   Widget _buildCouponSection() {
     return Consumer<CouponProvider>(
       builder: (context, couponProvider, _) {
@@ -522,6 +527,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     );
   }
 
+  // Tiêu đề Flash Sale / Gợi ý
   Widget _buildFlashSaleHeader() {
     return Container(
       margin: const EdgeInsets.only(top: 8),
@@ -560,6 +566,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     );
   }
 
+  // Danh sách danh mục sản phẩm (sắp xếp ngang)
   Widget _buildCategories() {
     return Consumer<ProductProvider>(
       builder: (context, productProvider, _) {
@@ -622,6 +629,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     );
   }
 
+  // Lưới hiển thị sản phẩm
   Widget _buildProductGrid() {
     return Consumer<ProductProvider>(
       builder: (context, productProvider, _) {
@@ -691,6 +699,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     );
   }
 
+  // Thẻ hiển thị thông tin sản phẩm thu gọn
   Widget _buildDenseProductCard(Product product) {
     return GestureDetector(
       onTap: () {
@@ -852,6 +861,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     );
   }
 
+  // Dialog cấu hình IP Server (dùng cho debug/demo)
   void _showConfigDialog(BuildContext context) {
     final ipController = TextEditingController(text: ApiConfig.hostIP);
     showDialog(

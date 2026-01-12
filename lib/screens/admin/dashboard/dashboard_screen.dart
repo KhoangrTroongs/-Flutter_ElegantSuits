@@ -45,6 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     _initSignalR();
   }
 
+  // Khởi tạo và lắng nghe thông báo SignalR
   void _initSignalR() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final signalRService = Provider.of<SignalRService>(
@@ -93,6 +94,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     });
   }
 
+  // Tải dữ liệu thống kê
   Future<void> _loadStatistics() async {
     if (!mounted) return;
 
@@ -102,7 +104,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         _errorMessage = null;
       });
 
-      // Lấy thống kê tháng này thay vì chỉ hôm nay
+      // Lấy thống kê của tháng hiện tại
       final stats = await _statisticsService.getMonthStatistics();
 
       if (!mounted) return;
@@ -139,13 +141,13 @@ class _DashboardScreenState extends State<DashboardScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Welcome Section
+            // Phần chào mừng
             _buildWelcomeSection(user?.displayName ?? 'Admin'),
             const SizedBox(height: 24),
-            // Stats Cards
+            // Các thẻ thống kê (Doanh thu, Đơn hàng)
             _buildStatsSection(),
             const SizedBox(height: 24),
-            // Quick Actions
+            // Các táp vụ nhanh
             _buildQuickActionsSection(context),
           ],
         ),
@@ -153,6 +155,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
+  // Xây dựng thanh tiêu đề (AppBar)
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       elevation: 0,
@@ -180,7 +183,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         IconButton(
           icon: const Icon(Icons.notifications_outlined),
           onPressed: () {},
-          tooltip: 'Notifications',
+          tooltip: 'Thông báo',
         ),
         PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
@@ -220,6 +223,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
+  // Khu vực chào mừng Admin
   Widget _buildWelcomeSection(String name) {
     return FadeInDown(
       duration: const Duration(milliseconds: 600),
@@ -237,7 +241,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Welcome back,',
+                    'Chào mừng trở lại,',
                     style: TextStyle(
                       color: AppTheme.textMuted.withValues(alpha: 0.8),
                       fontSize: 14,
@@ -254,7 +258,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Manage your store efficiently',
+                    'Quản lý cửa hàng của bạn hiệu quả hơn',
                     style: TextStyle(
                       color: AppTheme.textOnPrimary.withValues(alpha: 0.7),
                       fontSize: 13,
@@ -284,6 +288,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
+  // Định dạng tiền tệ (rút gọn)
   String _formatCurrency(double value) {
     if (value >= 1000000) {
       return '${(value / 1000000).toStringAsFixed(1)}M₫';
@@ -293,6 +298,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     return '${value.toStringAsFixed(0)}₫';
   }
 
+  // Khu vực hiển thị thống kê
   Widget _buildStatsSection() {
     if (_isLoading) {
       return Row(
@@ -362,6 +368,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
+  // Hiệu ứng Loading (Shimmer)
   Widget _buildLoadingCard() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -408,11 +415,12 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
+  // Khu vực chức năng nhanh (Quick Actions)
   Widget _buildQuickActionsSection(BuildContext context) {
     final items = [
       _QuickActionItem(
-        title: 'POS',
-        subtitle: 'Point of Sale',
+        title: 'Bán hàng (POS)',
+        subtitle: 'Tạo đơn hàng tại quầy',
         icon: Icons.point_of_sale_rounded,
         gradient: const LinearGradient(
           colors: [Color(0xFFD4AF37), Color(0xFF1a1a1a)],
@@ -422,8 +430,8 @@ class _DashboardScreenState extends State<DashboardScreen>
         onTap: () => _navigateTo(context, const PosScreen()),
       ),
       _QuickActionItem(
-        title: 'Products',
-        subtitle: 'Manage inventory',
+        title: 'Sản phẩm',
+        subtitle: 'Quản lý kho hàng',
         icon: Icons.inventory_2_outlined,
         gradient: const LinearGradient(
           colors: [Color(0xFF667eea), Color(0xFF764ba2)],
@@ -431,8 +439,8 @@ class _DashboardScreenState extends State<DashboardScreen>
         onTap: () => _navigateTo(context, const ProductsListScreen()),
       ),
       _QuickActionItem(
-        title: 'Orders',
-        subtitle: 'View all orders',
+        title: 'Đơn hàng',
+        subtitle: 'Xem tất cả đơn hàng',
         icon: Icons.receipt_long_outlined,
         gradient: const LinearGradient(
           colors: [Color(0xFFf093fb), Color(0xFFf5576c)],
@@ -440,8 +448,8 @@ class _DashboardScreenState extends State<DashboardScreen>
         onTap: () => _navigateTo(context, const OrdersListScreen()),
       ),
       _QuickActionItem(
-        title: 'Customers',
-        subtitle: 'Manage users',
+        title: 'Khách hàng',
+        subtitle: 'Quản lý người dùng',
         icon: Icons.people_outline,
         gradient: const LinearGradient(
           colors: [Color(0xFF4facfe), Color(0xFF00f2fe)],
@@ -449,8 +457,8 @@ class _DashboardScreenState extends State<DashboardScreen>
         onTap: () => _navigateTo(context, const UsersListScreen()),
       ),
       _QuickActionItem(
-        title: 'Coupons',
-        subtitle: 'Discount codes',
+        title: 'Mã giảm giá',
+        subtitle: 'Quản lý coupon',
         icon: Icons.local_offer_outlined,
         gradient: const LinearGradient(
           colors: [Color(0xFFfa709a), Color(0xFFfee140)],
@@ -472,7 +480,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Quick Actions',
+          'Truy cập nhanh',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,

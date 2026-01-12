@@ -25,10 +25,10 @@ class PosProvider extends ChangeNotifier {
   List<Product> get products => _products;
   List<Coupon> get availableCoupons => _availableCoupons;
 
-  // Khách vãn lai default email
+  // Email mặc định cho khách vãn lai
   static const String guestEmail = 'khachvanlai@example.com';
 
-  /// Tìm kiếm khách hàng (chỉ Customer, không bao gồm Admin)
+  // Tìm kiếm khách hàng (chỉ Customer)
   Future<void> searchCustomers(String query) async {
     if (query.isEmpty) {
       _searchedCustomers = [];
@@ -66,13 +66,13 @@ class PosProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Chọn khách hàng
+  // Chọn khách hàng hiện tại
   void selectCustomer(User customer) {
     _selectedCustomer = customer;
     notifyListeners();
   }
 
-  /// Chọn khách vãn lai
+  // Chọn khách vãn lai
   Future<void> selectGuestCustomer() async {
     _isLoading = true;
     notifyListeners();
@@ -127,7 +127,7 @@ class PosProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Load danh sách sản phẩm
+  // Tải danh sách sản phẩm
   Future<void> loadProducts() async {
     _isLoading = true;
     notifyListeners();
@@ -152,7 +152,7 @@ class PosProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Load danh sách coupon khả dụng
+  // Tải danh sách mã giảm giá
   Future<void> loadCoupons() async {
     try {
       final response = await ApiService.get(ApiConfig.coupons);
@@ -172,7 +172,7 @@ class PosProvider extends ChangeNotifier {
     }
   }
 
-  /// Thêm sản phẩm vào giỏ
+  // Thêm sản phẩm vào giỏ POS
   void addToCart(Product product, {int quantity = 1, String? size}) {
     // Kiểm tra số lượng tồn kho
     final existingItem = _cart.items
@@ -191,7 +191,7 @@ class PosProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Xóa sản phẩm khỏi giỏ
+  // Xóa sản phẩm khỏi giỏ POS
   void removeFromCart(int productId, {String? size}) {
     _cart.removeProduct(productId, size: size);
     _recalculateDiscount();
@@ -205,14 +205,14 @@ class PosProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Tính lại discount khi giỏ hàng thay đổi
+  // Tính lại giảm giá
   void _recalculateDiscount() {
     if (_cart.couponCode != null) {
       _cart.discountAmount = _cart.subtotal * _cart.discountPercentage / 100;
     }
   }
 
-  /// Load danh sách coupon khả dụng
+  // Tải mã giảm giá khả dụng
   Future<void> loadAvailableCoupons() async {
     try {
       final response = await ApiService.get(ApiConfig.coupons);
@@ -233,7 +233,7 @@ class PosProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Áp dụng coupon
+  // Áp dụng mã giảm giá
   Future<bool> applyCoupon(String code) async {
     _isLoading = true;
     _error = null;
@@ -283,7 +283,7 @@ class PosProvider extends ChangeNotifier {
     return false;
   }
 
-  /// Hủy coupon
+  // Hủy mã giảm giá
   void removeCoupon() {
     _cart.removeCoupon();
     notifyListeners();
@@ -308,7 +308,7 @@ class PosProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Format cho POS endpoint mới - gửi items trực tiếp
+      // Tạo dữ liệu đơn hàng
       final orderData = {
         'customerId': _selectedCustomer!.id,
         'shippingAddress': _selectedCustomer!.address ?? 'Mua tại cửa hàng',
@@ -345,7 +345,7 @@ class PosProvider extends ChangeNotifier {
     return null;
   }
 
-  /// Tạo URL thanh toán VNPay
+  // Tạo link thanh toán VNPay
   Future<String?> createVnPayPayment(int orderId) async {
     _isLoading = true;
     _error = null;
@@ -381,7 +381,7 @@ class PosProvider extends ChangeNotifier {
     return null;
   }
 
-  /// Đánh dấu thanh toán tiền mặt
+  // Xác nhận thanh toán tiền mặt
   Future<bool> markCashPayment(int orderId) async {
     _isLoading = true;
     _error = null;
@@ -428,7 +428,7 @@ class PosProvider extends ChangeNotifier {
     return null;
   }
 
-  /// Reset toàn bộ POS
+  // Đặt lại trạng thái POS
   void reset() {
     _cart = Cart();
     _selectedCustomer = null;
@@ -437,7 +437,7 @@ class PosProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Clear error
+  // Xóa thông báo lỗi
   void clearError() {
     _error = null;
     notifyListeners();

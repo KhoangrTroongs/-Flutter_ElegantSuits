@@ -47,6 +47,7 @@ class _CartScreenState extends State<CartScreen> {
     super.dispose();
   }
 
+  // Khởi tạo thanh toán VNPay
   Future<void> _initiateVnPay(BuildContext context, int orderId) async {
     try {
       String clientHost = ApiConfig.useRealDevice
@@ -267,6 +268,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
+  // Widget hiển thị từng sản phẩm trong giỏ hàng
   Widget _buildCartItem(
     BuildContext context,
     ApiCartItem item,
@@ -405,6 +407,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
+  // Thanh thanh toán ở dưới cùng màn hình
   Widget _buildBottomBar(
     BuildContext context,
     ApiCart cart,
@@ -481,6 +484,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
+  // Hiển thị modal nhập thông tin đặt hàng
   void _showCheckoutModal(
     BuildContext context,
     ApiCart cart,
@@ -666,6 +670,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
+  // Hiển thị modal xác nhận đơn hàng lần cuối
   void _showOrderReview(
     BuildContext context,
     ApiCart cart,
@@ -989,6 +994,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
+  // Xử lý logic đặt hàng
   Future<void> _processCheckout(BuildContext context) async {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
 
@@ -1044,6 +1050,7 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
+  // Hộp thoại xác nhận xóa sản phẩm
   Future<void> _showRemoveConfirmDialog(
     BuildContext context,
     CartProvider provider,
@@ -1073,6 +1080,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
+  // Hộp thoại chọn mã giảm giá
   void _showCouponSelection(
     BuildContext context,
     ApiCart cart,

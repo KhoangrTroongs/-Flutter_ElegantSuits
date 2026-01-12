@@ -33,7 +33,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: const Text('Products'),
+        title: const Text('Quản lý sản phẩm'),
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 8),
@@ -98,6 +98,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
     );
   }
 
+  // Hiển thị trạng thái rỗng
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -110,7 +111,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No products found',
+            'Không tìm thấy sản phẩm',
             style: TextStyle(
               fontSize: 18,
               color: AppTheme.textSecondary,
@@ -119,7 +120,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Add your first product to get started',
+            'Thêm sản phẩm mới để bắt đầu',
             style: TextStyle(fontSize: 14, color: AppTheme.textMuted),
           ),
         ],
@@ -127,6 +128,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
     );
   }
 
+  // Hiển thị trạng thái lỗi
   Widget _buildErrorState(String error) {
     return Center(
       child: Column(
@@ -157,6 +159,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
     );
   }
 
+  // Xác nhận xóa sản phẩm
   Future<void> _confirmDelete(
     BuildContext context,
     ProductProvider provider,
@@ -174,12 +177,12 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
           ],
         ),
         content: const Text(
-          'Are you sure you want to delete this product? This action cannot be undone.',
+          'Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text('Hủy'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -187,7 +190,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
               backgroundColor: AppTheme.errorColor,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Delete'),
+            child: const Text('Xóa'),
           ),
         ],
       ),
@@ -365,6 +368,7 @@ class _ProductCard extends StatelessWidget {
     );
   }
 
+  // Widget hiển thị placeholder khi không có ảnh
   Widget _buildPlaceholder() {
     return Center(
       child: Icon(

@@ -1,72 +1,29 @@
-# 📱 Elegant Suits Admin App
+# Elegant Suits App
 
-Flutter admin app for managing Elegant Suits e-commerce store.
+Ứng dụng thương mại điện tử chuyên kinh doanh vest nam cao cấp, được xây dựng bằng Flutter.
 
-## ✅ Features
+## Tính năng chính
 
-- 🔐 **Authentication** - Login with email/password
-- 📊 **Dashboard** - Overview statistics
-- 🛍️ **Products Management** - CRUD operations for products
-- 📦 **Orders Management** - View and update order status
-- 👥 **Users Management** - View and manage users
-- 🎟️ **Coupons Management** - Create and manage discount coupons
+### Khách hàng (Client)
 
-## 🚀 Getting Started
+- **Duyệt sản phẩm**: Xem danh sách, chi tiết sản phẩm, tìm kiếm và lọc.
+- **Giỏ hàng & Đặt hàng**: Thêm vào giỏ, nhập mã giảm giá, đặt hàng nhanh chóng.
+- **Thanh toán**: Hỗ trợ thanh toán tiền mặt (COD) hoặc Online qua VNPay.
+- **Cá nhân**: Quản lý thông tin tài khoản, xem lịch sử đơn hàng.
 
-### Prerequisites
+### Quản trị viên (Admin)
 
-- Flutter SDK (3.10.1 or higher)
-- Dart SDK
-- Android Studio / VS Code
-- .NET API running (from DACN_ElegantSuits project)
+- **Dashboard**: Thống kê doanh thu, đơn hàng theo thời gian thực.
+- **Quản lý**:
+  - **Sản phẩm**: Thêm, sửa, xóa, ẩn/hiện sản phẩm.
+  - **Đơn hàng**: Xem chi tiết, cập nhật trạng thái đơn hàng.
+  - **Kho hàng**: Nhập/xuất kho, quét mã vạch (Barcode).
+  - **Người dùng & Coupon**: Quản lý khách hàng và mã giảm giá.
+- **POS (Tại quầy)**: Tạo đơn hàng trực tiếp cho khách tại cửa hàng.
 
-### Installation
+## Nhóm thực hiện
 
-1. **Install dependencies**
-```bash
-flutter pub get
-```
-
-2. **Update API URL**
-
-Edit `lib/config/api_config.dart`:
-```dart
-static const String baseUrl = 'https://your-api-url.com/api';
-```
-
-3. **Run the app**
-```bash
-flutter run
-```
-
-## 📱 Screens
-
-- Login Screen
-- Dashboard
-- Products List & Form
-- Orders List & Detail
-- Users List
-- Coupons List & Form
-
-## 🔐 Authentication
-
-JWT token authentication with SharedPreferences storage.
-
-## 📦 Dependencies
-
-- provider (State management)
-- http & dio (API calls)
-- shared_preferences (Storage)
-- intl (Date formatting)
-- fl_chart (Charts)
-
-## 🛠️ Build
-
-```bash
-flutter build apk --release
-```
-
-## 👨‍💻 Author
-
-Ngo Huu Duc - 2280600725
-"# DACN_APP_ElegantSuits" 
+- **Ngô Hữu Đức** - 2280600725
+- **Hoàng Ân** - 2280600149
+- **Quách Quang Minh** - 2280601957
+- **Nguyễn Quốc Trung** - 2280603457

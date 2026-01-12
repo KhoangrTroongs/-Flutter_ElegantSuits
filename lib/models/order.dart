@@ -57,6 +57,7 @@ class Order {
     );
   }
 
+  // Phân tích trạng thái thanh toán
   static String _parsePaymentStatus(dynamic status) {
     if (status is int) {
       // 0=Pending, 1=Paid, 2=Failed
@@ -68,6 +69,7 @@ class Order {
     return status?.toString() ?? 'Pending';
   }
 
+  // Phân tích trạng thái đơn hàng
   static String _parseStatus(dynamic status) {
     if (status is int) {
       // Enum values: 0=Pending, 1=Confirmed, 2=Shipping, 3=Delivered, 4=Cancelled, 5=Returned

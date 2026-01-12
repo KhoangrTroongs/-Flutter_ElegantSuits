@@ -32,6 +32,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     _loadOrder();
   }
 
+  // Tải chi tiết đơn hàng từ API
   Future<void> _loadOrder() async {
     final provider = Provider.of<OrderProvider>(context, listen: false);
     final order = await provider.getOrderById(widget.orderId);
@@ -41,6 +42,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     });
   }
 
+  // Cập nhật trạng thái đơn hàng
   Future<void> _updateStatus(String newStatus) async {
     setState(() => _isUpdating = true);
     final provider = Provider.of<OrderProvider>(context, listen: false);
@@ -78,6 +80,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
   }
 
+  // Lấy màu sắc theo trạng thái
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -97,6 +100,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
   }
 
+  // Lấy icon theo trạng thái
   IconData _getStatusIcon(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -138,10 +142,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       );
     }
 
+    // Trạng thái không tìm thấy đơn hàng
     if (_order == null) {
       return Scaffold(
         backgroundColor: AppTheme.backgroundColor,
-        appBar: AppBar(title: const Text('Order Details')),
+        appBar: AppBar(title: const Text('Chi tiết đơn hàng')),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -149,7 +154,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               Icon(Icons.error_outline, size: 64, color: AppTheme.textMuted),
               const SizedBox(height: 16),
               Text(
-                'Order not found',
+                'Không tìm thấy đơn hàng',
                 style: TextStyle(fontSize: 18, color: AppTheme.textSecondary),
               ),
             ],
@@ -237,10 +242,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     builder: (context) {
                       // Map legacy statuses just in case of Hot Reload state mismatch
                       String currentStatus = _order!.status;
-                      if (currentStatus == 'Processing')
+                      if (currentStatus == 'Processing') {
                         currentStatus = 'Confirmed';
-                      if (currentStatus == 'Shipped')
+                      }
+                      if (currentStatus == 'Shipped') {
                         currentStatus = 'Shipping';
+                      }
 
                       final validStatuses = [
                         'Pending',
@@ -415,6 +422,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
+  // Tạo card thông tin
   Widget _buildInfoCard({
     required String title,
     required IconData icon,
@@ -458,6 +466,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
+  // Tạo dòng thông tin chi tiết
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -480,6 +489,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
+  // Hiển thị item trong đơn hàng
   Widget _buildOrderItem(OrderItem item) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),

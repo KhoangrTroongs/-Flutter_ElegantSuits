@@ -23,7 +23,7 @@ class StatisticsOverview {
     );
   }
 
-  // Tính doanh thu hôm nay (giả sử từ API trả về)
+  // Tính doanh thu hôm nay
   double get todaySales => totalRevenue;
 }
 
@@ -55,6 +55,7 @@ class OrdersByStatus {
     );
   }
 
-  int get total => pending + confirmed + shipping + delivered + cancelled + returned;
+  // Tổng số đơn hàng
+  int get total =>
+      pending + confirmed + shipping + delivered + cancelled + returned;
 }
-

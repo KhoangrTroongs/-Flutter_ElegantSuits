@@ -11,6 +11,7 @@ class SignalRService extends ChangeNotifier {
 
   bool get isConnected => _hubConnection?.state == HubConnectionState.connected;
 
+  // Khởi tạo kết nối SignalR
   Future<void> initSignalR() async {
     // If connected or connecting, do nothing
     if (_hubConnection?.state == HubConnectionState.connected ||
@@ -48,6 +49,7 @@ class SignalRService extends ChangeNotifier {
     }
   }
 
+  // Ngắt kết nối SignalR
   Future<void> stop() async {
     await _hubConnection?.stop();
   }

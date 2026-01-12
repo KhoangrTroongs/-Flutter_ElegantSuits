@@ -1,3 +1,4 @@
+// Mô hình giỏ hàng từ API
 class ApiCart {
   final int id;
   final String userId;
@@ -29,6 +30,7 @@ class ApiCart {
   }
 }
 
+// Mô hình chi tiết sản phẩm trong giỏ hàng
 class ApiCartItem {
   final int id; // CartItemId
   final int productId;

@@ -11,6 +11,7 @@ class AuthService {
     scopes: ['email', 'profile', 'openid'],
   );
 
+  // Đăng nhập với Email và Password
   Future<LoginResponse> login(String email, String password) async {
     // ... existing login code ...
     try {
@@ -40,6 +41,7 @@ class AuthService {
     }
   }
 
+  // Đăng nhập với Google
   Future<LoginResponse> loginWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
@@ -92,6 +94,7 @@ class AuthService {
     }
   }
 
+  // Đăng ký tài khoản
   Future<bool> register(Map<String, dynamic> data) async {
     try {
       final response = await ApiService.post(ApiConfig.register, data);
@@ -116,10 +119,12 @@ class AuthService {
     }
   }
 
+  // Đăng xuất
   Future<void> logout() async {
     await ApiService.removeToken();
   }
 
+  // Kiểm tra trạng thái đăng nhập
   Future<bool> isLoggedIn() async {
     final token = await ApiService.getToken();
     return token != null;

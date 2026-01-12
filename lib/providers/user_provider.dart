@@ -13,6 +13,7 @@ class UserProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
+  // Lấy danh sách người dùng
   Future<void> fetchUsers() async {
     _isLoading = true;
     _error = null;
@@ -29,6 +30,7 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  // Xóa người dùng (Soft Delete nếu Backend hỗ trợ)
   Future<bool> deleteUser(String id) async {
     try {
       await _userService.deleteUser(id);
@@ -42,4 +44,3 @@ class UserProvider extends ChangeNotifier {
     }
   }
 }
-

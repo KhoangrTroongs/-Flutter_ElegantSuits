@@ -14,6 +14,7 @@ class AuthProvider extends ChangeNotifier {
   String? get error => _error;
   bool get isAuthenticated => _user != null;
 
+  // Đăng nhập bằng Email/Password
   Future<bool> login(String email, String password) async {
     _isLoading = true;
     _error = null;
@@ -33,6 +34,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // Đăng nhập bằng Google
   Future<bool> loginWithGoogle() async {
     _isLoading = true;
     _error = null;
@@ -55,6 +57,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // Đăng ký tài khoản mới
   Future<bool> register(Map<String, dynamic> data) async {
     _isLoading = true;
     _error = null;
@@ -73,12 +76,14 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // Đăng xuất
   Future<void> logout() async {
     await _authService.logout();
     _user = null;
     notifyListeners();
   }
 
+  // Kiểm tra trạng thái đăng nhập
   Future<bool> checkAuth() async {
     return await _authService.isLoggedIn();
   }

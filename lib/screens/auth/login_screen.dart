@@ -55,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
+  // Xử lý đăng nhập
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -114,10 +115,10 @@ class _LoginScreenState extends State<LoginScreen>
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Logo Section
+                            // Logo ứng dụng
                             _buildLogoSection(),
                             const SizedBox(height: 40),
-                            // Login Card
+                            // Form đăng nhập
                             _buildLoginCard(),
                           ],
                         ),
@@ -126,12 +127,13 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                 ),
               ),
+              // Nút quay lại trang chủ
               Positioned(
                 top: 10,
                 left: 10,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white54),
-                  tooltip: 'Back to Home',
+                  tooltip: 'Trở về trang chủ',
                   onPressed: () {
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
@@ -141,6 +143,7 @@ class _LoginScreenState extends State<LoginScreen>
                   },
                 ),
               ),
+              // Nút cài đặt cấu hình Server (dành cho Dev/Admin)
               Positioned(
                 top: 10,
                 right: 10,
@@ -156,6 +159,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  // Hiển thị dialog cấu hình IP
   void _showConfigDialog() {
     final ipController = TextEditingController(text: ApiConfig.hostIP);
     showDialog(
@@ -205,6 +209,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  // Logo ứng dụng
   Widget _buildLogoSection() {
     return Column(
       children: [
@@ -240,6 +245,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  // Card form đăng nhập
   Widget _buildLoginCard() {
     return Container(
       padding: const EdgeInsets.all(32),

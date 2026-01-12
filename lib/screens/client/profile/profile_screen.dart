@@ -162,6 +162,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  // Widget hiển thị thông tin dạng dòng (Tile)
   Widget _buildInfoTile(IconData icon, String title, String value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

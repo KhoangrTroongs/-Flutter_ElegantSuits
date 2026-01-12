@@ -62,6 +62,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
     );
   }
 
+  // Hiển thị trạng thái rỗng
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -86,6 +87,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
     );
   }
 
+  // Hiển thị trạng thái lỗi
   Widget _buildErrorState(String error) {
     return Center(
       child: Column(
@@ -116,6 +118,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
     );
   }
 
+  // Xác nhận xóa người dùng
   Future<void> _confirmDelete(
     BuildContext context,
     UserProvider provider,

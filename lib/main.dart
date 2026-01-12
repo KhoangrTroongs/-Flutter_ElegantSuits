@@ -20,8 +20,7 @@ import 'screens/admin/inventory/inventory_screen.dart';
 import 'screens/admin/pos/pos_screen.dart';
 import 'config/api_config.dart';
 
-/// HttpOverrides để bypass SSL certificate check trong development
-/// CHỈ SỬ DỤNG CHO DEVELOPMENT - KHÔNG DÙNG CHO PRODUCTION!
+/// Override HTTP để bỏ qua lỗi SSL (Dev only)
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
@@ -34,11 +33,10 @@ class MyHttpOverrides extends HttpOverrides {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load Global Config (IP Address, etc.)
+  // Khởi tạo cấu hình API toàn cục
   await ApiConfig.init();
 
-  // Bypass SSL certificate check cho development (Android Emulator, etc.)
-  // Chỉ áp dụng cho non-web platforms
+  // Bỏ qua lỗi SSL trên Mobile (Dev only)
   if (!kIsWeb) {
     HttpOverrides.global = MyHttpOverrides();
   }
@@ -131,7 +129,7 @@ class _SplashScreenState extends State<SplashScreen>
       await authProvider.checkAuth();
 
       if (mounted) {
-        // Navigate to ClientHomeScreen as the initial screen for everyone (Guest/User)
+        // Chuyển hướng đến màn hình chính
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
@@ -164,7 +162,7 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo
+                // Logo ứng dụng
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
@@ -179,7 +177,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
                 const SizedBox(height: 32),
-                // Brand Name
+                // Tên thương hiệu
                 ShaderMask(
                   shaderCallback: (bounds) =>
                       AppTheme.goldGradient.createShader(bounds),
@@ -203,7 +201,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
                 const SizedBox(height: 48),
-                // Loading Indicator
+                // Biểu tượng tải trang
                 SizedBox(
                   width: 32,
                   height: 32,

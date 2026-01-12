@@ -29,7 +29,7 @@ class ApiService {
 
   static Future<http.Response> get(String url) async {
     final headers = await getHeaders();
-    // Debug: in headers để kiểm tra token
+    // Debug header để kiểm tra token
     print('=== API GET ===');
     print('URL: $url');
     print('Headers: $headers');
@@ -66,7 +66,7 @@ class ApiService {
         .timeout(ApiConfig.timeout);
   }
 
-  // Multipart POST for form data (file upload)
+  // Gửi POST request dạng Multipart (Upload file)
   static Future<http.Response> postForm(
     String url,
     Map<String, String> fields,
@@ -84,7 +84,7 @@ class ApiService {
     return await http.Response.fromStream(streamedResponse);
   }
 
-  // Multipart PUT for form data (file upload)
+  // Gửi PUT request dạng Multipart (Upload file)
   static Future<http.Response> putForm(
     String url,
     Map<String, String> fields,
@@ -102,7 +102,7 @@ class ApiService {
     return await http.Response.fromStream(streamedResponse);
   }
 
-  // Upload file với multipart
+  // Tải lên file từ đường dẫn
   static Future<http.Response> uploadFile(
     String url,
     String filePath,
@@ -116,10 +116,10 @@ class ApiService {
       request.headers['Authorization'] = 'Bearer $token';
     }
 
-    // Thêm file
+    // Thêm file vào request
     request.files.add(await http.MultipartFile.fromPath(fieldName, filePath));
 
-    // Thêm các fields bổ sung nếu có
+    // Thêm các trường dữ liệu bổ sung
     if (additionalFields != null) {
       request.fields.addAll(additionalFields);
     }
@@ -128,7 +128,7 @@ class ApiService {
     return await http.Response.fromStream(streamedResponse);
   }
 
-  // Upload file từ bytes (cho web hoặc camera)
+  // Tải lên file từ mảng bytes (Web/Camera)
   static Future<http.Response> uploadFileBytes(
     String url,
     List<int> bytes,
@@ -148,7 +148,7 @@ class ApiService {
       http.MultipartFile.fromBytes(fieldName, bytes, filename: fileName),
     );
 
-    // Thêm các fields bổ sung nếu có
+    // Thêm các trường dữ liệu bổ sung
     if (additionalFields != null) {
       request.fields.addAll(additionalFields);
     }

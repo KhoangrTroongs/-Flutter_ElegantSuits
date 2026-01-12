@@ -23,6 +23,7 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
   void initState() {
     super.initState();
 
+    // Cấu hình Controller cho WebView
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
@@ -39,7 +40,7 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
           },
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) {
-            // Check for custom scheme "elegantsuits://"
+            // Kiểm tra Deep Link "elegantsuits://" để xử lý kết quả thanh toán
             if (request.url.startsWith('elegantsuits://')) {
               _handleDeepLink(request.url);
               return NavigationDecision.prevent;
@@ -51,15 +52,16 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
       ..loadRequest(Uri.parse(widget.paymentUrl));
   }
 
+  // Xử lý Deep Link trả về từ cổng thanh toán
   void _handleDeepLink(String url) {
-    // Parse the URL
+    // Parse URL và lấy các tham số trạng thái
     final uri = Uri.parse(url);
     // Expected: elegantsuits://payment-result?orderId=123&status=success
 
     final status = uri.queryParameters['status'];
     // final orderId = uri.queryParameters['orderId']; // Optional usage
 
-    // Pop with result
+    // Đóng màn hình WebView và trả về kết quả
     if (mounted) {
       Navigator.of(context).pop({'status': status, 'fullUrl': url});
     }

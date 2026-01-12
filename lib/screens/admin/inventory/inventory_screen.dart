@@ -37,6 +37,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     super.dispose();
   }
 
+  // Lọc danh sách theo từ khóa tìm kiếm
   List<InventoryItem> _getFilteredItems(List<InventoryItem> items) {
     if (_searchQuery.isEmpty) return items;
     final query = _searchQuery.toLowerCase();
@@ -183,6 +184,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
+  // Hiển thị từng item tồn kho
+  // Bao gồm thông tin sản phẩm và các nút nhập/xuất nhanh
   Widget _buildInventoryItem(InventoryItem item) {
     final bool lowStock = item.quantity < 10;
 
@@ -296,6 +299,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
+  // Chuyển màn hình quét mã barcode
   void _navigateToScan(BuildContext context) {
     Navigator.push(
       context,
@@ -303,6 +307,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
+  // Hiển thị dialog nhập/xuất kho
+  // Cho phép điều chỉnh số lượng tồn kho
   void _showQuantityDialog(InventoryItem item, {required bool isImport}) {
     final controller = TextEditingController(text: '1');
 
@@ -403,6 +409,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
+  // Hiển thị chi tiết item
+  // Xem thông tin chi tiết và thao tác nhập/xuất
   void _showItemDetail(InventoryItem item) {
     showModalBottomSheet(
       context: context,

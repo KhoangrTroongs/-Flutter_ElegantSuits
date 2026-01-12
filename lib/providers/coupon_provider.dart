@@ -13,6 +13,7 @@ class CouponProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
+  // Lấy danh sách mã giảm giá
   Future<void> fetchCoupons() async {
     _isLoading = true;
     _error = null;
@@ -29,6 +30,7 @@ class CouponProvider extends ChangeNotifier {
     }
   }
 
+  // Thêm mã giảm giá mới
   Future<bool> addCoupon(Coupon coupon) async {
     try {
       final newCoupon = await _couponService.createCoupon(coupon);
@@ -42,6 +44,7 @@ class CouponProvider extends ChangeNotifier {
     }
   }
 
+  // Cập nhật mã giảm giá
   Future<bool> updateCoupon(int id, Coupon coupon) async {
     try {
       final updatedCoupon = await _couponService.updateCoupon(id, coupon);
@@ -58,6 +61,7 @@ class CouponProvider extends ChangeNotifier {
     }
   }
 
+  // Xóa mã giảm giá
   Future<bool> deleteCoupon(int id) async {
     try {
       await _couponService.deleteCoupon(id);
@@ -71,4 +75,3 @@ class CouponProvider extends ChangeNotifier {
     }
   }
 }
-
